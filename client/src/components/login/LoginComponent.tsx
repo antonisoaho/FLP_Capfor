@@ -13,6 +13,7 @@ import React, { useState } from 'react';
 import axiosInstance from '../../axios/AxiosInstance';
 import { AxiosResponse } from 'axios';
 import LoginResponse from './models/LoginResponse';
+import globalRouter from '../../globalRouter';
 
 function LoginComponent() {
   const [email, setEmail] = useState<string>('');
@@ -28,6 +29,8 @@ function LoginComponent() {
     if (response.status === 200) {
       setShowSuccessMessage(true);
       localStorage.setItem('JWT', response.data.token);
+
+      if (globalRouter.navigate) globalRouter.navigate('/');
     } else {
       setShowErrorMessage(true);
     }

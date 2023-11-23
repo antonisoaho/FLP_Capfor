@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../axios/AxiosInstance';
 import { Container, Box } from '@mui/material';
+import globalRouter from '../../globalRouter';
 
 const AccountModel = () => {
   const [password, setPassword] = useState<string>('');
@@ -18,7 +19,7 @@ const AccountModel = () => {
 function AccountComponent() {
   return (
     <Container>
-      <Box></Box>
+      <Box>My Accountpage</Box>
     </Container>
   );
 }
