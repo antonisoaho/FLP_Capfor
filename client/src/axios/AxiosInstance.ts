@@ -1,16 +1,20 @@
 import axios, { AxiosResponse } from 'axios';
 import globalRouter from '../../src/globalRouter';
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
+
 
 const baseURL = 'http://localhost:3001/';
 
 const axiosInstance = axios.create({
   baseURL,
-  headers: { Authorization: localStorage.getItem('JWT') },
+  headers: { Authorization: cookies.get("TOKEN") },
 });
 
 axios.interceptors.request.use(
   (config) => {
-    config.headers['Authorization'] = localStorage.getItem('JWT');
+    config.headers['Authorization'] = cookies.get("TOKEN");
     return config;
   },
   (err) => {

@@ -11,6 +11,7 @@ import LoginComponent from './components/login/LoginComponent';
 import UserComponent from './components/users/UserComponents';
 import ResponsiveAppBar from './components/navbar/NavbarComponent';
 import AccountComponent from './components/account/AccountComponent';
+import ProtectedRoute from './components/RouteComponents/ProtectedRoute';
 
 function App() {
   const navigate = useNavigate();
@@ -20,10 +21,10 @@ function App() {
     <div className="App">
       <ResponsiveAppBar />
       <Routes>
-        <Route path="/" element={<HomeComponent />}></Route>
-        <Route path="login" element={<LoginComponent />}></Route>
-        <Route path="users" element={<UserComponent />}></Route>
-        <Route path="/account" element={<AccountComponent />}></Route>
+        <Route path="/login" element={<LoginComponent />} />
+        <Route path="/" element={<ProtectedRoute><Route Component={HomeComponent} /></ProtectedRoute>} />
+        <Route path="/users" element={<ProtectedRoute><Route Component={UserComponent} /></ProtectedRoute>} />
+        <Route path="/account" element={<ProtectedRoute><Route Component={AccountComponent} /></ProtectedRoute>} />
       </Routes>
     </div>
   );
