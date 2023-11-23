@@ -9,18 +9,22 @@ const loginRoute = require('./routes/Login');
 const auth = require('./middleware/auth');
 const path = require('path');
 const dotenv = require('dotenv');
+const cors = require('cors');
 
 // express app
 const app = express();
 app.use(express.static(path.resolve(__dirname, '../client/build')));
+app.use(cors());
+
+//config
 dotenv.config();
+
 // connect to mongodb
 const dbURI = process.env.DB_URI;
 
 mongoose
   .connect(dbURI)
   .then((result) => {
-    console.log('Connected to DB.');
     console.log('Listening for requests..');
     app.listen(3001);
   })

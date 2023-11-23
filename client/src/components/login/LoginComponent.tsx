@@ -1,15 +1,49 @@
 import {
+  Alert,
   Box,
   Button,
   Card,
   CardActions,
   CardContent,
   Container,
-  Grid,
+  Snackbar,
   TextField,
 } from '@mui/material';
+import React, { useState } from 'react';
+import axiosInstance from '../../axios/AxiosInstance';
+import { AxiosResponse } from 'axios';
+import LoginResponse from './models/LoginResponse';
 
 function LoginComponent() {
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+
+  const Login = async () => {
+    const response = await axiosInstance.post<LoginResponse>('/login', {
+      email,
+      password,
+    });
+    if (response.status === 200) {
+      setShowSuccessMessage(true);
+      localStorage.setItem('JWT', response.data.token);
+    } else {
+      setShowErrorMessage(true);
+    }
+  };
+
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setShowErrorMessage(false);
+    setShowSuccessMessage(false);
+  };
   return (
     <Container component="main" maxWidth="xs">
       <Box
@@ -26,23 +60,27 @@ function LoginComponent() {
             }}
           >
             <TextField
-              id="outlined-basic"
+              id="loginEmail"
               label="Email"
               variant="outlined"
               type="email"
+              required
+              onChange={(event) => setEmail(event.target.value)}
             ></TextField>
             <TextField
-              id="outlined-basic"
+              id="loginPassword"
               label="Password"
               variant="outlined"
               type="password"
+              required
+              onChange={(event) => setPassword(event.target.value)}
             ></TextField>
             <CardActions
               sx={{
                 justifyContent: 'flex-end',
               }}
             >
-              <Button variant="outlined" color="primary">
+              <Button variant="outlined" color="primary" onClick={Login}>
                 Login
               </Button>
               <Button variant="outlined" color="secondary">
@@ -52,6 +90,24 @@ function LoginComponent() {
           </CardContent>
         </Card>
       </Box>
+      <Snackbar
+        open={showErrorMessage}
+        autoHideDuration={4000}
+        onClose={handleClose}
+      >
+        <Alert severity="error" onClose={handleClose}>
+          Invalid email or password!
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={showSuccessMessage}
+        autoHideDuration={4000}
+        onClose={handleClose}
+      >
+        <Alert severity="success" onClose={handleClose}>
+          Logged in sucessfully!
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

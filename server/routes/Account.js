@@ -1,23 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const loggedIn = require('../index');
 
 router
-  .get((req, res) => {
-    !loggedIn
-      ? res.redirect('/login')
-      : res.render('account', {
-          title: 'My Account',
-          passwordChange: '',
-          passwordStatus: '',
-        });
+  .get('/', (req, res) => {
+    try {
+      res.status(200).send();
+    } catch (err) {
+      console.log(err.status);
+    }
   })
   .post(async (req, res) => {
     // Change password on account here
-    if (!loggedIn) {
-      res.redirect('/login');
-    }
-
     const { currentPassword, newPassword, confirmPassword } = req.body;
     const userId = req.session.loggedInUser.userId;
 
