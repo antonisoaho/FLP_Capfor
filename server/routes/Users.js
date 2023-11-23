@@ -1,11 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const { User } = require('../models/users');
+const jwt = require('jsonwebtoken');
 
 router
   .get('/', (req, res) => {
     User.find()
       .sort({ createdAt: -1 })
+      .then((result) => {
+        res.json(result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  })
+  .get('/getme', (req, res) => {
+    const token = req.headers['authorization'];
+    const decryptedToken = jwt.decode(token);
+
+    User.findById(decryptedToken.userId)
       .then((result) => {
         res.json(result);
       })

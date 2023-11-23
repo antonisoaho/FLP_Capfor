@@ -1,20 +1,16 @@
 import axios, { AxiosResponse } from 'axios';
 import globalRouter from '../../src/globalRouter';
-import Cookies from 'universal-cookie';
-
-const cookies = new Cookies();
 
 const baseURL = 'http://localhost:3001/';
 
 const axiosInstance = axios.create({
   baseURL,
-  headers: { Authorization: cookies.get('TOKEN') },
+  headers: { Authorization: localStorage.getItem('TOKEN') },
 });
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    console.log(cookies.get('TOKEN'));
-    config.headers['Authorization'] = cookies.get('TOKEN');
+    config.headers['Authorization'] = localStorage.getItem('TOKEN');
     return config;
   },
   (err) => {
@@ -32,7 +28,8 @@ axiosInstance.interceptors.response.use(
       globalRouter.navigate
     ) {
       globalRouter.navigate('/login');
-      cookies.remove('TOKEN');
+      localStorage.removeItem('TOKEN');
+      localStorage.removeItem('USERNAME');
     }
 
     return err;

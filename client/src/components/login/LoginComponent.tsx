@@ -14,10 +14,7 @@ import axiosInstance from '../../axios/AxiosInstance';
 import { AxiosResponse } from 'axios';
 import LoginResponse from './models/LoginResponse';
 import globalRouter from '../../globalRouter';
-import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
-const cookies = new Cookies();
-
 
 function LoginComponent() {
   const [email, setEmail] = useState<string>('');
@@ -34,11 +31,10 @@ function LoginComponent() {
     });
     if (response.status === 200) {
       setShowSuccessMessage(true);
-      cookies.set("TOKEN", response.data.token, {
-        path: "/",
-      });
-      
-      navigate("/")
+      localStorage.setItem('TOKEN', response.data.token);
+      localStorage.setItem('USERNAME', response.data.name);
+
+      navigate('/');
 
       if (globalRouter.navigate) globalRouter.navigate('/');
     } else {

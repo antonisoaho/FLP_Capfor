@@ -1,10 +1,10 @@
-import React from "react";
-import { Navigate, useLocation } from "react-router-dom";
-import Cookies from 'universal-cookie';
-const cookies = new Cookies();
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 
-export const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
-  const token = cookies.get("TOKEN");
+export const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({
+  children,
+}) => {
+  const token = localStorage.getItem('TOKEN');
   let location = useLocation();
 
   if (!token) {
@@ -13,6 +13,5 @@ export const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }
 
   return children;
 };
-  
 
 export default ProtectedRoute;

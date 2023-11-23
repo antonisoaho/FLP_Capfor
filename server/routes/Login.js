@@ -31,10 +31,11 @@ router
             { userId: user._id },
             process.env.JWT_TOKENKEY,
             {
-              expiresIn: 10,
+              expiresIn: '2h',
             }
           );
-
+          const decryptedToken = jwt.decode(token);
+          console.log(decryptedToken);
           // save user token
           loggedInUser.token = token;
 
