@@ -22,9 +22,32 @@ function App() {
       <ResponsiveAppBar />
       <Routes>
         <Route path="/login" element={<LoginComponent />} />
-        <Route path="/" element={<ProtectedRoute><Route Component={HomeComponent} /></ProtectedRoute>} />
-        <Route path="/users" element={<ProtectedRoute><Route Component={UserComponent} /></ProtectedRoute>} />
-        <Route path="/account" element={<ProtectedRoute><Route Component={AccountComponent} /></ProtectedRoute>} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <HomeComponent />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <UserComponent />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account"
+          element={
+            <ProtectedRoute>
+              <AccountComponent />
+            </ProtectedRoute>
+          }
+        />
+        {/* <Route path="/users" element={<ProtectedRoute><Route Component={UserComponent} /></ProtectedRoute>} />
+        <Route path="/account" element={<ProtectedRoute><Route Component={AccountComponent} /></ProtectedRoute>} /> */}
       </Routes>
     </div>
   );

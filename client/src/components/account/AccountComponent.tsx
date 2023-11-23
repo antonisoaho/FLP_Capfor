@@ -4,7 +4,8 @@ import { Container, Box } from '@mui/material';
 import globalRouter from '../../globalRouter';
 
 const AccountModel = () => {
-  const [password, setPassword] = useState<string>('');
+  const [newPassword, setNewPassword] = useState<string>('');
+  const [oldPassword, setOldPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {

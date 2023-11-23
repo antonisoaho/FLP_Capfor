@@ -31,7 +31,7 @@ router
             { userId: user._id },
             process.env.JWT_TOKENKEY,
             {
-              expiresIn: '2h',
+              expiresIn: 10,
             }
           );
 

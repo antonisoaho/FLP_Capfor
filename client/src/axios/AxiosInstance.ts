@@ -4,17 +4,17 @@ import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
 
-
 const baseURL = 'http://localhost:3001/';
 
 const axiosInstance = axios.create({
   baseURL,
-  headers: { Authorization: cookies.get("TOKEN") },
+  headers: { Authorization: cookies.get('TOKEN') },
 });
 
-axios.interceptors.request.use(
+axiosInstance.interceptors.request.use(
   (config) => {
-    config.headers['Authorization'] = cookies.get("TOKEN");
+    console.log(cookies.get('TOKEN'));
+    config.headers['Authorization'] = cookies.get('TOKEN');
     return config;
   },
   (err) => {
@@ -32,6 +32,7 @@ axiosInstance.interceptors.response.use(
       globalRouter.navigate
     ) {
       globalRouter.navigate('/login');
+      cookies.remove('TOKEN');
     }
 
     return err;
