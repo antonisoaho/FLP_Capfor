@@ -12,7 +12,7 @@ router
 
     try {
       const passwordMatch = await login(email, password);
-      console.log(passwordMatch);
+
       if (passwordMatch) {
         const user = await getUserByEmail(email);
 
@@ -35,7 +35,7 @@ router
             }
           );
           const decryptedToken = jwt.decode(token);
-          console.log(decryptedToken);
+
           // save user token
           loggedInUser.token = token;
 
