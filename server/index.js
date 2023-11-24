@@ -21,12 +21,13 @@ dotenv.config();
 
 // connect to mongodb
 const dbURI = process.env.DB_URI;
+const port = process.end.PORT || 3001;
 
 mongoose
   .connect(dbURI)
   .then((result) => {
     console.log('Listening for requests..');
-    app.listen(3001);
+    app.listen(port);
   })
   .catch((err) => console.log(err));
 
