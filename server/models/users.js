@@ -38,7 +38,7 @@ userSchema.pre('save', async function (next) {
 
 const User = mongoose.model('User', userSchema);
 
-async function login(email, password) {
+const login = async (email, password) => {
   try {
     // Query to get user data by email
     const user = await User.findOne({ email });
@@ -57,9 +57,9 @@ async function login(email, password) {
     console.error('Error during login:', error);
     throw error;
   }
-}
+};
 
-async function getUserByEmail(email) {
+const getUserByEmail = async (email) => {
   try {
     const user = await User.findOne({ email });
 
@@ -69,9 +69,9 @@ async function getUserByEmail(email) {
     console.error('Error fetching user by email:', error);
     throw error;
   }
-}
+};
 
-async function hashPassword(password) {
+const hashPassword = async (password) => {
   try {
     // Generate salt
     const salt = await bcrypt.genSalt(saltRounds);
@@ -83,6 +83,6 @@ async function hashPassword(password) {
   } catch (err) {
     throw err;
   }
-}
+};
 
-module.exports = { User, login, logout, getUserByEmail, hashPassword };
+module.exports = { User, login, getUserByEmail, hashPassword };

@@ -4,6 +4,7 @@ type LoginResponse = {
   email: string;
   roleId: number;
   token: string;
+  acceptedUser: boolean;
 };
 
 export default LoginResponse;

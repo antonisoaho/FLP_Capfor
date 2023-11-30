@@ -2,7 +2,6 @@ import React, { useState, useEffect, Fragment } from 'react';
 import UserModel from './models/UserModel';
 import axiosInstance from '../../axios/AxiosInstance';
 import {
-  Box,
   CircularProgress,
   Container,
   Paper,

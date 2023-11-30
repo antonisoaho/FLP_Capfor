@@ -17,7 +17,6 @@ router
   .get('/getme', (req, res) => {
     const token = req.headers['authorization'];
     const decryptedToken = jwt.decode(token);
-
     User.findById(decryptedToken.userId)
       .then((result) => {
         res.json(result);
@@ -27,10 +26,14 @@ router
       });
   })
   .get('/logout', (req, res) => {
-    //Endpoints to logout
     const token = req.headers['authorization'];
-    const decryptedToken = jwt.decode(token);
+    const decodedToken = jwt.decode(token);
+
+    invalidateToken(token);
+
+    res.status(200).send();
   })
+
   .post('/', (req, res) => {
     //Create new user from userpanel
     const user = new User({ ...req.body });

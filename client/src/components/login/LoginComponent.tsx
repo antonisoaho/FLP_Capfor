@@ -9,14 +9,13 @@ import {
   Snackbar,
   TextField,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useState, KeyboardEvent } from 'react';
 import axiosInstance from '../../axios/AxiosInstance';
-import { AxiosResponse } from 'axios';
 import LoginResponse from './models/LoginResponse';
 import globalRouter from '../../globalRouter';
 import { useNavigate } from 'react-router-dom';
 
-function LoginComponent() {
+const LoginComponent: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
@@ -24,13 +23,21 @@ function LoginComponent() {
 
   const navigate = useNavigate();
 
+  const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      Login();
+    }
+  };
+
   const Login = async () => {
     const response = await axiosInstance.post<LoginResponse>('/login', {
       email,
       password,
     });
     if (response.status === 200) {
+      console.log(response.data);
       setShowSuccessMessage(true);
+
       localStorage.setItem('TOKEN', response.data.token);
       localStorage.setItem('USERNAME', response.data.name);
 
@@ -78,10 +85,11 @@ function LoginComponent() {
             ></TextField>
             <TextField
               id="loginPassword"
-              label="Password"
+              label="Lösenord"
               variant="outlined"
               type="password"
               required
+              onKeyPress={handleKeyPress}
               onChange={(event) => setPassword(event.target.value)}
             ></TextField>
             <CardActions
@@ -90,10 +98,10 @@ function LoginComponent() {
               }}
             >
               <Button variant="outlined" color="primary" onClick={Login}>
-                Login
+                Logga in
               </Button>
               <Button variant="outlined" color="secondary">
-                Create user
+                Skapa användare
               </Button>
             </CardActions>
           </CardContent>
@@ -119,6 +127,6 @@ function LoginComponent() {
       </Snackbar>
     </Container>
   );
-}
+};
 
 export default LoginComponent;

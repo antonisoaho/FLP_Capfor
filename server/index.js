@@ -6,7 +6,7 @@ const userRoute = require('./routes/Users');
 // const customerRoute = require('./routes/Customers');
 const accountRoute = require('./routes/Account');
 const loginRoute = require('./routes/Login');
-const auth = require('./middleware/auth');
+const { auth } = require('./middleware/auth');
 const path = require('path');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -43,7 +43,8 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use('/account', auth, accountRoute);
+// app.use('/account', auth, accountRoute);
 // app.use('/customers', auth, customerRoute);
 app.use('/users', auth, userRoute);
+// app.use('/logout', auth);
 app.use('/login', loginRoute);

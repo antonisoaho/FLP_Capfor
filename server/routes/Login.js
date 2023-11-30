@@ -25,6 +25,7 @@ router
             name: user.name,
             email: user.email,
             roleId: user.role,
+            acceptedUser: user.acceptedUser,
           };
 
           const token = jwt.sign(
@@ -34,7 +35,6 @@ router
               expiresIn: '2h',
             }
           );
-          const decryptedToken = jwt.decode(token);
 
           // save user token
           loggedInUser.token = token;

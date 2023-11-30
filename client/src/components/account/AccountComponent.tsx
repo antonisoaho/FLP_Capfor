@@ -5,8 +5,6 @@ import globalRouter from '../../globalRouter';
 import AccountModel from './models/AccountModel';
 
 const AccountComponent = () => {
-  const [newPassword, setNewPassword] = useState<string>('');
-  const [oldPassword, setOldPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [account, setAccount] = useState<AccountModel | undefined>(undefined);
 

@@ -1,7 +1,7 @@
 function HomeComponent() {
   return (
     <div>
-      <h1>This is the Homepage.</h1>
+      <h1>Startsida för hemsidan.</h1>
     </div>
   );
 }

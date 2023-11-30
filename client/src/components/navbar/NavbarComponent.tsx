@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AppBar,
   Avatar,
@@ -13,20 +13,30 @@ import {
   Typography,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
+import MenuIcon from '@mui/icons-material/Menu';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import { useTheme } from '../../theme/ThemeProvider';
 
 const pages = [
-  { title: 'Home', link: '/', protected: false },
-  { title: 'Users', link: '/users', protected: true },
-  { title: 'Customers', link: '/customers', protected: true },
+  { title: 'Start', link: '/', protected: false },
+  { title: 'Användare', link: '/users', protected: true },
+  { title: 'Kunder', link: '/customers', protected: true },
 ];
 const settings = [
-  { title: 'Account', link: '/account' },
-  { title: 'Logout', link: '/logout' },
+  { title: 'Mitt konto', link: '/account' },
+  { title: 'Logga ut', link: '/logout' },
 ];
 
-function ResponsiveAppBar() {
+const ResponsiveAppBar = () => {
   const username = localStorage.getItem('USERNAME');
   const token = localStorage.getItem('TOKEN');
+
+  const { toggleTheme, isDarkMode } = useTheme();
+
+  const toggleDarkMode = () => {
+    toggleTheme();
+  };
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
@@ -74,12 +84,14 @@ function ResponsiveAppBar() {
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
-              aria-label="account of current user"
+              aria-label="more"
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
               color="inherit"
-            ></IconButton>
+            >
+              <MenuIcon />
+            </IconButton>
             <Menu
               id="menu-appbar"
               anchorEl={anchorElNav}
@@ -117,8 +129,8 @@ function ResponsiveAppBar() {
           <Typography
             variant="h5"
             noWrap
-            component="a"
-            href="/"
+            to={'/'}
+            component={Link}
             sx={{
               mr: 2,
               display: { xs: 'flex', md: 'none' },
@@ -152,7 +164,7 @@ function ResponsiveAppBar() {
           </Box>
           {token ? (
             <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open settings">
+              <Tooltip title="Öppna inställningar">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar>
                     {username ? username.substring(0, 1).toUpperCase() : '-'}
@@ -175,6 +187,14 @@ function ResponsiveAppBar() {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
+                <Link to="#" onClick={toggleDarkMode}>
+                  <MenuItem>
+                    {'Mörkt tema'}
+                    <IconButton sx={{ ml: 1 }} color="inherit">
+                      {isDarkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+                    </IconButton>
+                  </MenuItem>
+                </Link>
                 {settings.map((setting) => (
                   <Link to={setting.link} key={setting.title}>
                     <MenuItem onClick={handleCloseUserMenu}>
@@ -193,12 +213,12 @@ function ResponsiveAppBar() {
               component={Link}
               sx={{ my: 2, color: 'white', display: 'block' }}
             >
-              LOGIN
+              Logga in
             </Button>
           )}
         </Toolbar>
       </Container>
     </AppBar>
   );
-}
+};
 export default ResponsiveAppBar;

@@ -28,12 +28,20 @@ axiosInstance.interceptors.response.use(
       globalRouter.navigate
     ) {
       globalRouter.navigate('/login');
-      localStorage.removeItem('TOKEN');
-      localStorage.removeItem('USERNAME');
+      Logout();
     }
 
     return err;
   }
 );
+
+export const Logout = () => {
+  localStorage.removeItem('TOKEN');
+  localStorage.removeItem('USERNAME');
+
+  delete axiosInstance.defaults.headers['Authorization'];
+
+  // globalRouter.navigate('/');
+};
 
 export default axiosInstance;
