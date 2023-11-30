@@ -21,7 +21,7 @@ dotenv.config();
 
 // connect to mongodb
 const dbURI = process.env.DB_URI;
-const port = process.end.PORT || 3001;
+const port = process.env.PORT || 3001;
 
 mongoose
   .connect(dbURI)

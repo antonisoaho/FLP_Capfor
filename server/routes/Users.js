@@ -26,6 +26,11 @@ router
         console.log(err);
       });
   })
+  .get('/logout', (req, res) => {
+    //Endpoints to logout
+    const token = req.headers['authorization'];
+    const decryptedToken = jwt.decode(token);
+  })
   .post('/', (req, res) => {
     //Create new user from userpanel
     const user = new User({ ...req.body });

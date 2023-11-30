@@ -4,6 +4,7 @@ const router = express.Router();
 router
   .get('/', (req, res) => {
     try {
+      console.log('OK det hämtas här');
       res.status(200).send();
     } catch (err) {
       console.log(err.status);

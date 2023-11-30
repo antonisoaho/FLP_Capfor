@@ -9,6 +9,7 @@ const userSchema = new Schema(
     email: { type: String, required: true },
     password: { type: String, required: true },
     role: { type: Number, required: true, default: 4 },
+    acceptedUser: { type: Boolean, required: true, default: false },
   },
   { timestamps: true }
 );
@@ -84,4 +85,4 @@ async function hashPassword(password) {
   }
 }
 
-module.exports = { User, login, getUserByEmail, hashPassword };
+module.exports = { User, login, logout, getUserByEmail, hashPassword };
