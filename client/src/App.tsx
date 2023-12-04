@@ -14,6 +14,7 @@ import AccountComponent from './components/account/AccountComponent';
 import ProtectedRoute from './components/RouteComponents/ProtectedRoute';
 import LogoutComponent from './components/logout/LogoutComponent';
 import { ThemeProvider } from './theme/ThemeProvider';
+import CreateUserComponent from './components/users/createUser/CreateUserComponent';
 
 const App = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const App = () => {
         <ResponsiveAppBar />
         <Routes>
           <Route path="/login" element={<LoginComponent />} />
+          <Route path="/newuser" element={<CreateUserComponent />} />
           <Route path="/" element={<HomeComponent />} />
           <Route
             path="/logout"

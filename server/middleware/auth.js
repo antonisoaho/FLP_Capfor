@@ -11,7 +11,8 @@ const auth = (req, res, next) => {
     const decoded = jwt.verify(token, JWT_TOKEN);
     req.user = decoded;
   } catch (err) {
-    return res.status(401).send(err);
+    console.error('JWT Verification Error:', err.message);
+    return res.status(401).send('Invalid token.');
   }
   return next();
 };

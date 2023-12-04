@@ -10,44 +10,51 @@ import {
   TextField,
 } from '@mui/material';
 import React, { useState, KeyboardEvent } from 'react';
-import axiosInstance from '../../axios/AxiosInstance';
-import LoginResponse from './models/LoginResponse';
-import globalRouter from '../../globalRouter';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import CreateUserModel from './models/CreateUserModel';
+import axiosInstance from '../../../axios/AxiosInstance';
 
-const LoginComponent: React.FC = () => {
+const CreateUserComponent: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [name, setName] = useState<string>('');
+
   const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
-  const [showErrorAccept, setShowErrorAccept] = useState<boolean>(false);
 
+  const token = localStorage.getItem('TOKEN');
   const navigate = useNavigate();
 
-  const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      Login();
+  const CreateUser = async () => {
+    if (password !== confirmPassword) {
+      setShowErrorMessage(true);
+      return;
+    }
+    const response = await axiosInstance.post<CreateUserModel>(
+      '/users/createuser',
+      {
+        name,
+        email,
+        password,
+        acceptedUser: token ? true : false,
+      }
+    );
+    console.log(response);
+    if (response.status === 201) {
+      setShowSuccessMessage(true);
+
+      navigate('/');
+    } else {
+      console.log(response);
+      setShowErrorMessage(true);
     }
   };
 
-  const Login = async () => {
-    const response = await axiosInstance.post<LoginResponse>('/login', {
-      email,
-      password,
-    });
-    if (response.status === 200 && response.data.acceptedUser) {
-      setShowSuccessMessage(true);
-
-      localStorage.setItem('TOKEN', response.data.token);
-      localStorage.setItem('USERNAME', response.data.name);
-
-      navigate('/');
-
-      if (globalRouter.navigate) globalRouter.navigate('/');
-    } else if (!response.data.acceptedUser) {
-      setShowErrorAccept(true);
-    } else {
-      setShowErrorMessage(true);
+  const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      CreateUser();
     }
   };
 
@@ -61,7 +68,6 @@ const LoginComponent: React.FC = () => {
 
     setShowErrorMessage(false);
     setShowSuccessMessage(false);
-    setShowErrorAccept(false);
   };
   return (
     <Container component="main" maxWidth="xs">
@@ -79,6 +85,14 @@ const LoginComponent: React.FC = () => {
             }}
           >
             <TextField
+              id="username"
+              label="Namn"
+              variant="outlined"
+              type="email"
+              required
+              onChange={(event) => setName(event.target.value)}
+            ></TextField>
+            <TextField
               id="loginEmail"
               label="Email"
               variant="outlined"
@@ -92,19 +106,24 @@ const LoginComponent: React.FC = () => {
               variant="outlined"
               type="password"
               required
-              onKeyPress={handleKeyPress}
               onChange={(event) => setPassword(event.target.value)}
+            ></TextField>
+            <TextField
+              id="configrmLoginPassword"
+              label="Repetera lösenord"
+              variant="outlined"
+              type="password"
+              required
+              onKeyPress={handleKeyPress}
+              onChange={(event) => setConfirmPassword(event.target.value)}
             ></TextField>
             <CardActions
               sx={{
                 justifyContent: 'flex-end',
               }}
             >
-              <Button variant="outlined" color="primary" onClick={Login}>
-                Logga in
-              </Button>
-              <Button variant="outlined" color="secondary" href="/newuser">
-                Skapa användare
+              <Button variant="outlined" color="primary" onClick={CreateUser}>
+                Skapa konto
               </Button>
             </CardActions>
           </CardContent>
@@ -116,16 +135,7 @@ const LoginComponent: React.FC = () => {
         onClose={handleClose}
       >
         <Alert severity="error" onClose={handleClose}>
-          Fel användarnamn eller lösenord.
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={showErrorAccept}
-        autoHideDuration={4000}
-        onClose={handleClose}
-      >
-        <Alert severity="error" onClose={handleClose}>
-          Väntar på att bli accepterad.
+          Lösenorden du skrivit in matchar inte.
         </Alert>
       </Snackbar>
       <Snackbar
@@ -134,11 +144,11 @@ const LoginComponent: React.FC = () => {
         onClose={handleClose}
       >
         <Alert severity="success" onClose={handleClose}>
-          Lyckad inloggning!
+          Användare skapad - skickar dig vidare.
         </Alert>
       </Snackbar>
     </Container>
   );
 };
 
-export default LoginComponent;
+export default CreateUserComponent;

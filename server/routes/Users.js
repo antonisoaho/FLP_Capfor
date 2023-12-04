@@ -27,15 +27,14 @@ router
   })
   .get('/logout', (req, res) => {
     const token = req.headers['authorization'];
-    const decodedToken = jwt.decode(token);
 
     invalidateToken(token);
 
     res.status(200).send();
   })
+  .post('/createuser', (req, res) => {
+    //users/createuser for new users
 
-  .post('/', (req, res) => {
-    //Create new user from userpanel
     const user = new User({ ...req.body });
 
     user
