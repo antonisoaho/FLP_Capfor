@@ -37,14 +37,6 @@ const App = () => {
             }
           />
           <Route
-            path="/newuser"
-            element={
-              <ProtectedRoute>
-                <CreateUserComponent />
-              </ProtectedRoute>
-            }
-          />
-          <Route
             path="/users"
             element={
               <ProtectedRoute>

@@ -5,21 +5,41 @@ const jwt = require('jsonwebtoken');
 const { auth } = require('../middleware/auth');
 
 router
-  .get('/', auth, (req, res) => {
+  .get('/', (req, res) => {
     const { userId, isAdmin } = req.user;
 
     User.find()
       .sort({ createdAt: -1 })
       .then((result) => {
-        res.json({ userId, isAdmin, users: result });
+        const parsedResult = result.map((person) => ({
+          _id: person._id,
+          name: person.name,
+          isAdmin: person.isAdmin,
+        }));
+
+        res.json({ userId, isAdmin, users: parsedResult });
       })
       .catch((err) => {
         console.log(err);
       });
   })
+  .get('/singleuser/:id', (req, res) => {
+    const { isAdmin } = req.user;
+
+    if (isAdmin) {
+      User.findById(req.params.id)
+        .then((result) => {
+          res.json(result);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  })
   .get('/getme', (req, res) => {
     const token = req.headers['authorization'];
     const decryptedToken = jwt.decode(token);
+
     User.findById(decryptedToken.userId)
       .then((result) => {
         res.json(result);

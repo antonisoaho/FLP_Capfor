@@ -40,8 +40,6 @@ export const Logout = () => {
   localStorage.removeItem('USERNAME');
 
   delete axiosInstance.defaults.headers['Authorization'];
-
-  // globalRouter.navigate('/');
 };
 
 export default axiosInstance;

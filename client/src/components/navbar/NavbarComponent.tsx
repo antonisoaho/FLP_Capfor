@@ -158,9 +158,7 @@ const ResponsiveAppBar = () => {
                 >
                   {page.title}
                 </Button>
-              ) : (
-                <></>
-              )
+              ) : null
             )}
           </Box>
           {token ? (
@@ -189,6 +187,7 @@ const ResponsiveAppBar = () => {
                 onClose={handleCloseUserMenu}
               >
                 <MenuItem
+                  key="themetoggler"
                   onClick={() => {
                     toggleDarkMode();
                     handleCloseUserMenu();

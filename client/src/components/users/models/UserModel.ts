@@ -1,7 +1,10 @@
 type UserModel = {
+  _id: string;
   name: string;
   email: string;
-  role: number;
+  isAdmin: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export default UserModel;

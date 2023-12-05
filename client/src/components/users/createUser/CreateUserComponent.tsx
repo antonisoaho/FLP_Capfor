@@ -21,7 +21,13 @@ import CreateUserModel from './models/CreateUserModel';
 import axiosInstance from '../../../axios/AxiosInstance';
 import { VisibilityOff, Visibility } from '@mui/icons-material';
 
-const CreateUserComponent: React.FC = () => {
+interface CreateUserComponentProps {
+  onUserCreated: () => void;
+}
+
+const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
+  onUserCreated,
+}) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -39,7 +45,6 @@ const CreateUserComponent: React.FC = () => {
   ) => {
     event.preventDefault();
   };
-  console.log();
   const CreateUser = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -66,6 +71,8 @@ const CreateUserComponent: React.FC = () => {
         setPassword('');
         setConfirmPassword('');
         setCreateAdmin(false);
+
+        onUserCreated();
       } else {
         // Handle specific error status codes
         if (response?.status === 409) {
