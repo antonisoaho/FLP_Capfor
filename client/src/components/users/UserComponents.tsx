@@ -1,9 +1,12 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import UserModel from './models/UserModel';
 import axiosInstance from '../../axios/AxiosInstance';
+import CreateUserComponent from './createUser/CreateUserComponent';
 import {
   CircularProgress,
   Container,
+  Drawer,
+  Fab,
   Paper,
   SxProps,
   Table,
@@ -13,19 +16,35 @@ import {
   TableHead,
   TableRow,
   Theme,
+  Tooltip,
 } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 
 const UserComponent = () => {
   const [users, setUsers] = useState<Array<UserModel>>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+
+  const handleDrawerOpen = () => {
+    setDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+  };
 
   useEffect(() => {
     async function getUsers() {
       setLoading(true);
-      const response = await axiosInstance.get<Array<UserModel>>('/users');
+      const response = await axiosInstance.get('/users');
 
-      if (response.status === 200) setUsers(response.data);
-      setLoading(false);
+      console.log(response.data);
+      if (response.status === 200) {
+        setUsers(response.data.users);
+        setIsAdmin(response.data.isAdmin);
+        setLoading(false);
+      }
     }
     getUsers();
   }, []);
@@ -44,15 +63,39 @@ const UserComponent = () => {
         marginTop: 8,
       }}
     >
-      <Fragment>
+      {' '}
+      {isAdmin ? (
+        <>
+          <Tooltip title="Skapa användare" placement="top-start" arrow>
+            <Fab
+              sx={{
+                position: 'fixed',
+                right: 24,
+                bottom: 24,
+              }}
+              color="primary"
+              aria-label="add"
+              onClick={handleDrawerOpen}
+            >
+              <AddIcon />
+            </Fab>
+          </Tooltip>
+          <Drawer anchor="right" open={drawerOpen} onClose={handleDrawerClose}>
+            <CreateUserComponent />
+          </Drawer>
+        </>
+      ) : (
+        <></>
+      )}
+      <>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
                 <>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell align="right">Role ID</TableCell>
+                  <TableCell>Namn</TableCell>
+                  <TableCell>Mail</TableCell>
+                  <TableCell align="right">Roll</TableCell>
                 </>
               </TableRow>
             </TableHead>
@@ -85,7 +128,7 @@ const UserComponent = () => {
             )}
           </Table>
         </TableContainer>
-      </Fragment>
+      </>
     </Container>
   );
 };

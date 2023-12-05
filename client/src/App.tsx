@@ -26,13 +26,21 @@ const App = () => {
         <ResponsiveAppBar />
         <Routes>
           <Route path="/login" element={<LoginComponent />} />
-          <Route path="/newuser" element={<CreateUserComponent />} />
+
           <Route path="/" element={<HomeComponent />} />
           <Route
             path="/logout"
             element={
               <ProtectedRoute>
                 <LogoutComponent />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/newuser"
+            element={
+              <ProtectedRoute>
+                <CreateUserComponent />
               </ProtectedRoute>
             }
           />

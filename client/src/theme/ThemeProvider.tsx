@@ -42,10 +42,12 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     palette: {
       mode: isDarkMode ? 'dark' : 'light',
       primary: {
-        main: '#1976D2',
+        main: '#57a264',
+        light: '#befbc9',
+        dark: '#204126',
       },
       secondary: {
-        main: '#FF4081',
+        main: '#f50057',
       },
     },
   });

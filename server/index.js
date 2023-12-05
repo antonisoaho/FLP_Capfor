@@ -43,8 +43,6 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// app.use('/account', auth, accountRoute);
 // app.use('/customers', auth, customerRoute);
 app.use('/users', auth, userRoute);
-// app.use('/logout', auth);
 app.use('/login', loginRoute);

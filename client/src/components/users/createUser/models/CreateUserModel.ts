@@ -2,7 +2,7 @@ type CreateUserModel = {
   name: string;
   email: string;
   password: string;
-  acceptedUser: boolean;
+  role: number;
 };
 
 export default CreateUserModel;

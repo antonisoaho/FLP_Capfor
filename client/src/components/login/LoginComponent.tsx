@@ -35,7 +35,7 @@ const LoginComponent: React.FC = () => {
       email,
       password,
     });
-    if (response.status === 200 && response.data.acceptedUser) {
+    if (response.status === 200) {
       setShowSuccessMessage(true);
 
       localStorage.setItem('TOKEN', response.data.token);
@@ -44,8 +44,6 @@ const LoginComponent: React.FC = () => {
       navigate('/');
 
       if (globalRouter.navigate) globalRouter.navigate('/');
-    } else if (!response.data.acceptedUser) {
-      setShowErrorAccept(true);
     } else {
       setShowErrorMessage(true);
     }
@@ -100,11 +98,8 @@ const LoginComponent: React.FC = () => {
                 justifyContent: 'flex-end',
               }}
             >
-              <Button variant="outlined" color="primary" onClick={Login}>
+              <Button variant="contained" color="primary" onClick={Login}>
                 Logga in
-              </Button>
-              <Button variant="outlined" color="secondary" href="/newuser">
-                Skapa användare
               </Button>
             </CardActions>
           </CardContent>
@@ -117,15 +112,6 @@ const LoginComponent: React.FC = () => {
       >
         <Alert severity="error" onClose={handleClose}>
           Fel användarnamn eller lösenord.
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={showErrorAccept}
-        autoHideDuration={4000}
-        onClose={handleClose}
-      >
-        <Alert severity="error" onClose={handleClose}>
-          Väntar på att bli accepterad.
         </Alert>
       </Snackbar>
       <Snackbar

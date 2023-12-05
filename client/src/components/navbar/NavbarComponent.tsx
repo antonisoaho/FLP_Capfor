@@ -6,6 +6,7 @@ import {
   Button,
   Container,
   IconButton,
+  ListItemIcon,
   Menu,
   MenuItem,
   Toolbar,
@@ -187,22 +188,26 @@ const ResponsiveAppBar = () => {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                <Link to="#" onClick={toggleDarkMode}>
-                  <MenuItem>
-                    {'Mörkt tema'}
-                    <IconButton sx={{ ml: 1 }} color="inherit">
-                      {isDarkMode ? <Brightness7Icon /> : <Brightness4Icon />}
-                    </IconButton>
-                  </MenuItem>
-                </Link>
+                <MenuItem
+                  onClick={() => {
+                    toggleDarkMode();
+                    handleCloseUserMenu();
+                  }}
+                >
+                  <Typography textAlign="center">{'Mörkt tema'}</Typography>
+                  <ListItemIcon sx={{ ml: 1 }} color="inherit">
+                    {isDarkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+                  </ListItemIcon>
+                </MenuItem>
                 {settings.map((setting) => (
-                  <Link to={setting.link} key={setting.title}>
-                    <MenuItem onClick={handleCloseUserMenu}>
-                      <Typography textAlign="center">
-                        {setting.title}
-                      </Typography>
-                    </MenuItem>
-                  </Link>
+                  <MenuItem
+                    key={setting.title}
+                    to={setting.link}
+                    component={Link}
+                    onClick={handleCloseUserMenu}
+                  >
+                    <Typography textAlign="center">{setting.title}</Typography>
+                  </MenuItem>
                 ))}
               </Menu>
             </Box>

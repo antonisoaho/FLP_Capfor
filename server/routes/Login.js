@@ -24,12 +24,11 @@ router
             userId: user._id,
             name: user.name,
             email: user.email,
-            roleId: user.role,
-            acceptedUser: user.acceptedUser,
+            isAdmin: user.isAdmin,
           };
 
           const token = jwt.sign(
-            { userId: user._id },
+            { userId: user._id, isAdmin: user.isAdmin },
             process.env.JWT_TOKENKEY,
             {
               expiresIn: '2h',
