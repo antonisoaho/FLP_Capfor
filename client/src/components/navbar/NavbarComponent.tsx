@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   AppBar,
   Avatar,
@@ -34,17 +34,16 @@ const ResponsiveAppBar = () => {
   const token = localStorage.getItem('TOKEN');
 
   const { toggleTheme, isDarkMode } = useTheme();
-
-  const toggleDarkMode = () => {
-    toggleTheme();
-  };
-
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
+
+  const toggleDarkMode = () => {
+    toggleTheme();
+  };
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -121,9 +120,7 @@ const ResponsiveAppBar = () => {
                   >
                     <Typography textAlign="center">{page.title}</Typography>
                   </MenuItem>
-                ) : (
-                  <></>
-                )
+                ) : null
               )}
             </Menu>
           </Box>
@@ -225,4 +222,5 @@ const ResponsiveAppBar = () => {
     </AppBar>
   );
 };
+
 export default ResponsiveAppBar;

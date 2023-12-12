@@ -1,6 +1,6 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect } from 'react';
 import UserModel from './models/UserModel';
-import axiosInstance from '../../axios/AxiosInstance';
+import axiosInstance, { ExtendedError } from '../../axios/AxiosInstance';
 import CreateUserComponent from './createUser/CreateUserComponent';
 import {
   Box,
@@ -9,6 +9,7 @@ import {
   Container,
   Drawer,
   Fab,
+  Icon,
   IconButton,
   Paper,
   SxProps,
@@ -20,18 +21,19 @@ import {
   TableRow,
   Theme,
   Tooltip,
-  Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import UserCredentialsComponent from './usercredentials/UserCredentialsComponent';
 
 const UserComponent = () => {
   const [users, setUsers] = useState<Array<UserModel>>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+  const [changeOpen, setChangeOpen] = useState<boolean>(false);
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
@@ -40,16 +42,30 @@ const UserComponent = () => {
   const handleDrawerClose = () => {
     setDrawerOpen(false);
   };
+  const handleUserPrefsOpen = () => {
+    setChangeOpen(true);
+  };
+
+  const handleUserPrefsClose = () => {
+    setChangeOpen(false);
+  };
 
   const getUsers = async () => {
     setLoading(true);
-    const response = await axiosInstance.get('/users');
+    try {
+      const response = await axiosInstance.get('/users');
 
-    console.log(response.data);
-    if (response.status === 200) {
-      setUsers(response.data.users);
-      setIsAdmin(response.data.isAdmin);
-      setLoading(false);
+      if (response.status === 200) {
+        setUsers(response.data.users);
+        setIsAdmin(response.data.isAdmin);
+        setLoading(false);
+      }
+    } catch (error) {
+      const extendedError = error as ExtendedError;
+      if (extendedError.showSnackbar) {
+      } else {
+        console.error('Other error:', error);
+      }
     }
   };
 
@@ -57,7 +73,7 @@ const UserComponent = () => {
     getUsers();
   }, []);
 
-  const handleUserCreated = () => {
+  const handleUsers = () => {
     getUsers();
   };
 
@@ -107,7 +123,7 @@ const UserComponent = () => {
           <TableCell component="th" scope="row">
             {row.isAdmin ? 'Ansvarig' : 'Rådgivare'}
           </TableCell>
-          <TableCell align="right">{/* <EditIcon /> */}</TableCell>
+          <TableCell align="right"></TableCell>
         </TableRow>
         <TableRow>
           <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={3}>
@@ -121,7 +137,9 @@ const UserComponent = () => {
                       <TableCell>Uppdaterad</TableCell>
                       <TableCell>Skapad</TableCell>
                       <TableCell>
-                        <EditIcon />
+                        <Icon onClick={handleUserPrefsOpen}>
+                          <EditIcon />
+                        </Icon>
                       </TableCell>
                     </TableRow>
                   </TableHead>
@@ -135,6 +153,7 @@ const UserComponent = () => {
                       <TableCell>
                         {new Date(row.createdAt).toLocaleDateString()}
                       </TableCell>
+                      <TableCell />
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -179,10 +198,11 @@ const UserComponent = () => {
             </Fab>
           </Tooltip>
           <Drawer anchor="right" open={drawerOpen} onClose={handleDrawerClose}>
-            <CreateUserComponent onUserCreated={handleUserCreated} />
+            <CreateUserComponent onUserCreated={handleUsers} />
           </Drawer>
         </>
       )}
+
       <>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 450 }} aria-label="collapsible table">
@@ -212,7 +232,7 @@ const UserComponent = () => {
             ) : (
               <TableBody>
                 {users.map((user) => (
-                  <Row key={user.name} row={user} />
+                  <Row key={user._id} row={user} />
                 ))}
               </TableBody>
             )}

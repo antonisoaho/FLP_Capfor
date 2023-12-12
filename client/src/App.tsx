@@ -14,16 +14,36 @@ import AccountComponent from './components/account/AccountComponent';
 import ProtectedRoute from './components/RouteComponents/ProtectedRoute';
 import LogoutComponent from './components/logout/LogoutComponent';
 import { ThemeProvider } from './theme/ThemeProvider';
-import CreateUserComponent from './components/users/createUser/CreateUserComponent';
+import UserCredentialsComponent from './components/users/usercredentials/UserCredentialsComponent';
 
 const App = () => {
   const navigate = useNavigate();
   globalRouter.navigate = navigate;
 
+  const [snackbarInfo, setSnackbarInfo] = useState({
+    open: false,
+    message: '',
+    type: 'success',
+    onClose: () => setSnackbarInfo((prev) => ({ ...prev, open: false })),
+  });
+
+  const showSnackbar = (
+    message: string,
+    type: 'success' | 'error' | 'info' | 'warning'
+  ) => {
+    setSnackbarInfo({
+      open: true,
+      message,
+      type,
+      onClose: () => setSnackbarInfo((prev) => ({ ...prev, open: false })),
+    });
+  };
+
   return (
     <ThemeProvider>
       <div className="App">
         <ResponsiveAppBar />
+
         <Routes>
           <Route path="/login" element={<LoginComponent />} />
 
@@ -48,7 +68,7 @@ const App = () => {
             path="/account"
             element={
               <ProtectedRoute>
-                <AccountComponent />
+                <AccountComponent showSnackbar={showSnackbar} />
               </ProtectedRoute>
             }
           />

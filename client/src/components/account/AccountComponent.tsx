@@ -1,23 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../../axios/AxiosInstance';
+import axiosInstance, { ExtendedError } from '../../axios/AxiosInstance';
 import { Container, Box } from '@mui/material';
-import globalRouter from '../../globalRouter';
 import AccountModel from './models/AccountModel';
 
-const AccountComponent = () => {
+interface AccountComponentProps {
+  showSnackbar: (
+    message: string,
+    type: 'success' | 'error' | 'info' | 'warning'
+  ) => void;
+}
+
+const AccountComponent: React.FC<AccountComponentProps> = ({
+  showSnackbar,
+}) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [account, setAccount] = useState<AccountModel | undefined>(undefined);
 
   useEffect(() => {
-    async function getMyAccount() {
+    const getMyAccount = async () => {
       setLoading(true);
-      const response = await axiosInstance.get<AccountModel>('/users/getme');
+      try {
+        const response = await axiosInstance.get<AccountModel>('/users/getme');
 
-      if (response.status === 200) setAccount(response.data);
-      setLoading(false);
-    }
+        if (response.status === 200) setAccount(response.data);
+        setLoading(false);
+      } catch (error) {
+        const extendedError = error as ExtendedError;
+        if (extendedError.showSnackbar) {
+          showSnackbar(
+            extendedError.snackbarMessage || 'Ett fel inträffade',
+            'error'
+          );
+        } else {
+          console.error('Other error:', error);
+        }
+      }
+    };
     getMyAccount();
-  }, []);
+  }, [showSnackbar]);
 
   const changePassword = () => {
     // Lägg in en childComponent

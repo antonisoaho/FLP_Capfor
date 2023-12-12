@@ -25,6 +25,7 @@ router
             name: user.name,
             email: user.email,
             isAdmin: user.isAdmin,
+            lastLoggedIn: user.lastLoggedIn,
           };
 
           const token = jwt.sign(
@@ -37,7 +38,6 @@ router
 
           // save user token
           loggedInUser.token = token;
-
           res.status(200).json(loggedInUser);
         } else {
           res.status(404).send('User not found');

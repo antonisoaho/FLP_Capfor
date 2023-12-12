@@ -8,6 +8,7 @@ const userSchema = new Schema(
     name: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
+    // lastLoggedIn: { type: Date, required: true, default: undefined },
     isAdmin: { type: Boolean, required: true, default: false },
   },
   { timestamps: true }
@@ -15,22 +16,23 @@ const userSchema = new Schema(
 
 // Middleware to hash the password before saving
 userSchema.pre('save', async function (next) {
+  console.log('Den körs');
+  const user = this;
   // Hash the password only if its new or modified
-  if (!this.isModified('password')) {
-    return next();
-  }
+  if (!user.isModified('password')) return next();
 
   try {
     //Generate salt
     const salt = await bcrypt.genSalt(saltRounds);
 
     // Hash the password with the generated salt
-    const hashedPassword = await bcrypt.hash(this.password, salt);
+    const hashedPassword = await bcrypt.hash(user.password, salt);
 
     // Replace the plain text password with the hashed password
-    this.password = hashedPassword;
+    user.password = hashedPassword;
     next();
   } catch (error) {
+    console.error('Error in middleware:', error);
     return next(error);
   }
 });

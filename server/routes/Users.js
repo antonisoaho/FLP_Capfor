@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { User } = require('../models/users');
+const { User, hashPassword } = require('../models/users');
 const jwt = require('jsonwebtoken');
 const { auth } = require('../middleware/auth');
 
@@ -36,6 +36,35 @@ router
         });
     }
   })
+  .put('/singleuser/:id', async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+      const existingUser = await User.findById(userId);
+
+      if (!existingUser) {
+        return res.status(404).json({ error: 'Användaren hittades inte.' });
+      }
+      const newName = req.body.name;
+      const newEmail = req.body.email;
+      const newPassword = req.body.password;
+      const newRole = req.body.isAdmin;
+
+      newName ? (existingUser.name = newName) : '';
+      newEmail ? (existingUser.email = newEmail) : '';
+      newPassword ? (existingUser.password = newPassword) : '';
+      newRole ? (existingUser.isAdmin = req.body.isAdmin === 'true') : '';
+
+      const updatedUser = await existingUser.save();
+
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      console.error('Error updating user: ', error);
+      res
+        .status(500)
+        .json({ error: 'Ett fel inträffade vid uppdatering av användaren.' });
+    }
+  })
   .get('/getme', (req, res) => {
     const token = req.headers['authorization'];
     const decryptedToken = jwt.decode(token);
@@ -58,17 +87,17 @@ router
   .post('/createuser', auth, async (req, res) => {
     try {
       const existingUser = await User.findOne({ email: req.body.email });
-
       if (existingUser) {
-        return res.status(409).send('Email finns redan registrerad.');
+        res.status(409).json({ error: 'Email finns redan registrerad.' });
+        return;
       }
       const user = new User({ ...req.body });
-
       const result = await user.save();
-      res.status(201).json(result);
+
+      res.status(201).json({ success: true, user: result });
     } catch (err) {
       console.error(err);
-      res.status(500).send('Internal Server Error');
+      res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 

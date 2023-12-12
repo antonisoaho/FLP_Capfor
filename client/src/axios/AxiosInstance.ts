@@ -1,5 +1,11 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import globalRouter from '../../src/globalRouter';
+
+export interface ExtendedError extends AxiosError {
+  showSnackbar?: boolean;
+  snackbarMessage?: string;
+  snackbarType?: string;
+}
 
 const baseURL = 'http://localhost:3001/';
 
@@ -13,8 +19,8 @@ axiosInstance.interceptors.request.use(
     config.headers['Authorization'] = localStorage.getItem('TOKEN');
     return config;
   },
-  (err) => {
-    return err;
+  (err: ExtendedError) => {
+    return Promise.reject(err);
   }
 );
 
@@ -22,8 +28,9 @@ axiosInstance.interceptors.response.use(
   (response) => {
     return response;
   },
-  (err) => {
+  (err: ExtendedError) => {
     if (
+      err.response &&
       (err.response.status === 401 || err.response.status === 403) &&
       globalRouter.navigate
     ) {
@@ -31,7 +38,14 @@ axiosInstance.interceptors.response.use(
       Logout();
     }
 
-    return err;
+    const errorWithSnackbarInfo: ExtendedError = {
+      ...err,
+      showSnackbar: true,
+      snackbarMessage: err.message || 'Ett fel inträffade.',
+      snackbarType: 'error',
+    };
+
+    return Promise.reject(errorWithSnackbarInfo);
   }
 );
 

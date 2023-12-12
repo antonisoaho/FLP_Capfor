@@ -2,7 +2,7 @@ type LoginResponse = {
   userId: string;
   name: string;
   email: string;
-  isAdmin: number;
+  isAdmin: boolean;
   token: string;
 };
 

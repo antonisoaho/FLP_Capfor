@@ -20,6 +20,7 @@ import React, { useState } from 'react';
 import CreateUserModel from './models/CreateUserModel';
 import axiosInstance from '../../../axios/AxiosInstance';
 import { VisibilityOff, Visibility } from '@mui/icons-material';
+import axios from 'axios';
 
 interface CreateUserComponentProps {
   onUserCreated: () => void;
@@ -45,15 +46,11 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
   ) => {
     event.preventDefault();
   };
+
   const CreateUser = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     try {
-      if (password !== confirmPassword) {
-        setErrorMessage('Lösenorden du skrivit in matchar inte.');
-        setShowErrorMessage(true);
-        return;
-      }
       const response = await axiosInstance.post<CreateUserModel>(
         '/users/createuser',
         {
@@ -63,7 +60,7 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
           createAdmin,
         }
       );
-      console.log(response);
+
       if (response?.status === 201) {
         setShowSuccessMessage(true);
         setName('');
@@ -71,23 +68,31 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
         setPassword('');
         setConfirmPassword('');
         setCreateAdmin(false);
-
         onUserCreated();
       } else {
-        // Handle specific error status codes
-        if (response?.status === 409) {
-          setErrorMessage(
-            'Användaren med den angivna e-postadressen finns redan.'
-          );
-        } else {
-          setErrorMessage('Ett fel inträffade. Försök igen senare.');
-        }
+        // Annat fel
+        const errorMessage = 'Ett fel inträffade. Försök igen senare.';
+
+        setErrorMessage(errorMessage);
         setShowErrorMessage(true);
       }
     } catch (error) {
-      console.error('Unexpected error:', error);
-      setErrorMessage('Ett oväntat fel inträffade. Försök igen senare.');
-      setShowErrorMessage(true);
+      console.error('Oväntat fel:', error);
+
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 409) {
+          const errorMessage =
+            error.response?.data.error || 'Email finns redan registrerad.';
+          setErrorMessage(errorMessage);
+        } else {
+          setErrorMessage('Ett fel inträffade. Försök igen senare.');
+        }
+
+        setShowErrorMessage(true);
+      } else {
+        setErrorMessage('Kunde inte ansluta till servern.');
+        setShowErrorMessage(true);
+      }
     }
   };
 
