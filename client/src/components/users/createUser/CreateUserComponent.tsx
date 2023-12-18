@@ -14,7 +14,6 @@ import {
   OutlinedInput,
   Select,
   Snackbar,
-  TextField,
 } from '@mui/material';
 import React, { useState } from 'react';
 import CreateUserModel from './models/CreateUserModel';
@@ -26,9 +25,7 @@ interface CreateUserComponentProps {
   onUserCreated: () => void;
 }
 
-const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
-  onUserCreated,
-}) => {
+const CreateUserComponent: React.FC<CreateUserComponentProps> = ({ onUserCreated }) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -41,9 +38,7 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
-  const handleMouseDownPassword = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
 
@@ -51,15 +46,12 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
     event.preventDefault();
 
     try {
-      const response = await axiosInstance.post<CreateUserModel>(
-        '/users/createuser',
-        {
-          name,
-          email,
-          password,
-          createAdmin,
-        }
-      );
+      const response = await axiosInstance.post<CreateUserModel>('/users/createuser', {
+        name,
+        email,
+        password,
+        createAdmin,
+      });
 
       if (response?.status === 201) {
         setShowSuccessMessage(true);
@@ -81,8 +73,7 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
 
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 409) {
-          const errorMessage =
-            error.response?.data.error || 'Email finns redan registrerad.';
+          const errorMessage = error.response?.data.error || 'Email finns redan registrerad.';
           setErrorMessage(errorMessage);
         } else {
           setErrorMessage('Ett fel inträffade. Försök igen senare.');
@@ -96,10 +87,7 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
     }
   };
 
-  const handleClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
@@ -111,16 +99,14 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
     <Container
       component="main"
       maxWidth="xs"
-      style={{ padding: 0, paddingRight: 0, paddingLeft: 0 }}
-    >
+      style={{ padding: 0, paddingRight: 0, paddingLeft: 0 }}>
       <Box>
         <Card>
           <CardContent
             sx={{
               height: '100vh',
               width: 330,
-            }}
-          >
+            }}>
             <form
               id="newUser"
               name="newUserForm"
@@ -132,8 +118,7 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
                 flexDirection: 'column',
                 justifyContent: 'flex-start',
                 alignItems: 'flex-end',
-              }}
-            >
+              }}>
               <FormControl sx={{ m: 0.5, width: '100%' }} variant="outlined">
                 <InputLabel htmlFor="name">Namn</InputLabel>
                 <OutlinedInput
@@ -170,8 +155,7 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
                         aria-label="toggle password visibility"
                         onClick={handleClickShowPassword}
                         onMouseDown={handleMouseDownPassword}
-                        edge="end"
-                      >
+                        edge="end">
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -183,9 +167,7 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
                 />
               </FormControl>
               <FormControl sx={{ m: 0.5, width: '100%' }} variant="outlined">
-                <InputLabel htmlFor="confirmPassword">
-                  Repetera lösenord
-                </InputLabel>
+                <InputLabel htmlFor="confirmPassword">Repetera lösenord</InputLabel>
                 <OutlinedInput
                   id="confirmPassword"
                   type={showPassword ? 'text' : 'password'}
@@ -196,8 +178,7 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
                         aria-label="toggle password visibility"
                         onClick={handleClickShowPassword}
                         onMouseDown={handleMouseDownPassword}
-                        edge="end"
-                      >
+                        edge="end">
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -215,11 +196,8 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
                   id="createAdmin"
                   value={createAdmin}
                   label="Roll"
-                  onChange={(event) =>
-                    setCreateAdmin(event.target.value === 'true')
-                  }
-                  sx={{ textAlign: 'left' }}
-                >
+                  onChange={(event) => setCreateAdmin(event.target.value === 'true')}
+                  sx={{ textAlign: 'left' }}>
                   <MenuItem value="false">Rådgivare</MenuItem>
                   <MenuItem value="true">Ansvarig</MenuItem>
                 </Select>
@@ -227,8 +205,7 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
               <CardActions
                 sx={{
                   marginTop: 'auto',
-                }}
-              >
+                }}>
                 <Button variant="contained" color="primary" type="submit">
                   Skapa konto
                 </Button>
@@ -237,20 +214,12 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({
           </CardContent>
         </Card>
       </Box>
-      <Snackbar
-        open={showErrorMessage}
-        autoHideDuration={4000}
-        onClose={handleClose}
-      >
+      <Snackbar open={showErrorMessage} autoHideDuration={4000} onClose={handleClose}>
         <Alert severity="error" onClose={handleClose}>
           {errorMessage || 'Något gick snett..'}
         </Alert>
       </Snackbar>
-      <Snackbar
-        open={showSuccessMessage}
-        autoHideDuration={4000}
-        onClose={handleClose}
-      >
+      <Snackbar open={showSuccessMessage} autoHideDuration={4000} onClose={handleClose}>
         <Alert severity="success" onClose={handleClose}>
           Användare skapad.
         </Alert>

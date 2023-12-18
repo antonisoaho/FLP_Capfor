@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const userRoute = require('./routes/Users');
-// const customerRoute = require('./routes/Customers');
+const customerRoute = require('./routes/Customers');
 const accountRoute = require('./routes/Account');
 const loginRoute = require('./routes/Login');
 const { auth } = require('./middleware/auth');
@@ -43,6 +43,6 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// app.use('/customers', auth, customerRoute);
+app.use('/customers', auth, customerRoute);
 app.use('/users', auth, userRoute);
 app.use('/login', loginRoute);
