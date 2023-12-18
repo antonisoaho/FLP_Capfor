@@ -38,31 +38,31 @@ router
   })
   .put('/singleuser/:id', async (req, res) => {
     const userId = req.params.id;
+    const { isAdmin } = req.user;
 
-    try {
-      const existingUser = await User.findById(userId);
+    if (isAdmin) {
+      try {
+        const existingUser = await User.findById(userId);
+        if (!existingUser) {
+          return res.status(404).json({ error: 'Användaren hittades inte.' });
+        }
+        const newName = req.body.name;
+        const newEmail = req.body.email;
+        const newPassword = req.body.password;
+        const newRole = req.body.isAdmin;
 
-      if (!existingUser) {
-        return res.status(404).json({ error: 'Användaren hittades inte.' });
+        newName ? (existingUser.name = newName) : '';
+        newEmail ? (existingUser.email = newEmail) : '';
+        newPassword ? (existingUser.password = newPassword) : '';
+        newRole ? (existingUser.isAdmin = newRole) : '';
+
+        const updatedUser = await existingUser.save();
+        console.log(updatedUser);
+        res.status(200).json(updatedUser);
+      } catch (error) {
+        console.error('Error updating user: ', error);
+        res.status(500).json({ error: 'Ett fel inträffade vid uppdatering av användaren.' });
       }
-      const newName = req.body.name;
-      const newEmail = req.body.email;
-      const newPassword = req.body.password;
-      const newRole = req.body.isAdmin;
-
-      newName ? (existingUser.name = newName) : '';
-      newEmail ? (existingUser.email = newEmail) : '';
-      newPassword ? (existingUser.password = newPassword) : '';
-      newRole ? (existingUser.isAdmin = req.body.isAdmin === 'true') : '';
-
-      const updatedUser = await existingUser.save();
-
-      res.status(200).json(updatedUser);
-    } catch (error) {
-      console.error('Error updating user: ', error);
-      res
-        .status(500)
-        .json({ error: 'Ett fel inträffade vid uppdatering av användaren.' });
     }
   })
   .get('/getme', (req, res) => {

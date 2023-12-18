@@ -16,7 +16,6 @@ const userSchema = new Schema(
 
 // Middleware to hash the password before saving
 userSchema.pre('save', async function (next) {
-  console.log('Den körs');
   const user = this;
   // Hash the password only if its new or modified
   if (!user.isModified('password')) return next();

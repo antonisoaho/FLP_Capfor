@@ -14,7 +14,6 @@ import AccountComponent from './components/account/AccountComponent';
 import ProtectedRoute from './components/RouteComponents/ProtectedRoute';
 import LogoutComponent from './components/logout/LogoutComponent';
 import { ThemeProvider } from './theme/ThemeProvider';
-import UserCredentialsComponent from './components/users/usercredentials/UserCredentialsComponent';
 
 const App = () => {
   const navigate = useNavigate();
@@ -27,10 +26,7 @@ const App = () => {
     onClose: () => setSnackbarInfo((prev) => ({ ...prev, open: false })),
   });
 
-  const showSnackbar = (
-    message: string,
-    type: 'success' | 'error' | 'info' | 'warning'
-  ) => {
+  const showSnackbar = (message: string, type: 'success' | 'error' | 'info' | 'warning') => {
     setSnackbarInfo({
       open: true,
       message,

@@ -9,7 +9,6 @@ import {
   Container,
   Drawer,
   Fab,
-  Icon,
   IconButton,
   Paper,
   SxProps,
@@ -34,6 +33,7 @@ const UserComponent = () => {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [changeOpen, setChangeOpen] = useState<boolean>(false);
+  const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
@@ -42,8 +42,9 @@ const UserComponent = () => {
   const handleDrawerClose = () => {
     setDrawerOpen(false);
   };
-  const handleUserPrefsOpen = () => {
+  const handleUserPrefsOpen = (selectedUser: UserModel) => {
     setChangeOpen(true);
+    setSelectedUser(selectedUser);
   };
 
   const handleUserPrefsClose = () => {
@@ -77,15 +78,13 @@ const UserComponent = () => {
     getUsers();
   };
 
-  const Row = (props: { row: UserModel }) => {
-    const { row } = props;
+  const Row = (props: { row: UserModel; onUserPrefsOpen: (selectedUser: UserModel) => void }) => {
+    const { row, onUserPrefsOpen } = props;
     const [open, setOpen] = useState<boolean>(false);
 
     const handleOpen = async () => {
       if (!open && !row.email) {
-        const response = await axiosInstance.get(
-          `/users/singleuser/${row._id}`
-        );
+        const response = await axiosInstance.get(`/users/singleuser/${row._id}`);
         const user = response.data;
         const objIndex = users.findIndex((obj) => obj._id === row._id);
         users[objIndex].email = user.email;
@@ -106,13 +105,8 @@ const UserComponent = () => {
               maxWidth: '10px',
               padding: 0,
               paddingLeft: '16px',
-            }}
-          >
-            <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={handleOpen}
-            >
+            }}>
+            <IconButton aria-label="expand row" size="small" onClick={handleOpen}>
               {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
             </IconButton>
           </TableCell>
@@ -137,9 +131,11 @@ const UserComponent = () => {
                       <TableCell>Uppdaterad</TableCell>
                       <TableCell>Skapad</TableCell>
                       <TableCell>
-                        <Icon onClick={handleUserPrefsOpen}>
-                          <EditIcon />
-                        </Icon>
+                        <Tooltip title="Redigera användare" placement="right" arrow>
+                          <Fab size="small" aria-label="edit" onClick={() => onUserPrefsOpen(row)}>
+                            <EditIcon />
+                          </Fab>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   </TableHead>
@@ -147,12 +143,8 @@ const UserComponent = () => {
                     <TableRow>
                       <TableCell>{row._id}</TableCell>
                       <TableCell>{row.email}</TableCell>
-                      <TableCell>
-                        {new Date(row.updatedAt).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(row.createdAt).toLocaleDateString()}
-                      </TableCell>
+                      <TableCell>{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
+                      <TableCell>{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell />
                     </TableRow>
                   </TableBody>
@@ -179,8 +171,7 @@ const UserComponent = () => {
       maxWidth="md"
       sx={{
         marginTop: 4,
-      }}
-    >
+      }}>
       {isAdmin && (
         <>
           <Tooltip title="Skapa användare" placement="top-start" arrow>
@@ -192,8 +183,7 @@ const UserComponent = () => {
               }}
               color="primary"
               aria-label="add"
-              onClick={handleDrawerOpen}
-            >
+              onClick={handleDrawerOpen}>
               <AddIcon />
             </Fab>
           </Tooltip>
@@ -203,6 +193,19 @@ const UserComponent = () => {
         </>
       )}
 
+      {isAdmin && changeOpen && (
+        <>
+          <Drawer anchor="top" open={changeOpen} onClose={handleUserPrefsClose}>
+            <UserCredentialsComponent
+              onUserChanged={handleUsers}
+              _id={selectedUser?._id || ''}
+              name={selectedUser?.name || ''}
+              email={selectedUser?.email || ''}
+              isAdmin={selectedUser?.isAdmin || false}
+            />
+          </Drawer>
+        </>
+      )}
       <>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 450 }} aria-label="collapsible table">
@@ -232,7 +235,7 @@ const UserComponent = () => {
             ) : (
               <TableBody>
                 {users.map((user) => (
-                  <Row key={user._id} row={user} />
+                  <Row key={user._id} row={user} onUserPrefsOpen={handleUserPrefsOpen} />
                 ))}
               </TableBody>
             )}
