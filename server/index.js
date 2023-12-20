@@ -4,7 +4,6 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const userRoute = require('./routes/Users');
 const customerRoute = require('./routes/Customers');
-const accountRoute = require('./routes/Account');
 const loginRoute = require('./routes/Login');
 const { auth } = require('./middleware/auth');
 const path = require('path');

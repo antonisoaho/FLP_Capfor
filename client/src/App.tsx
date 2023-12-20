@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -14,11 +14,32 @@ import AccountComponent from './components/account/AccountComponent';
 import ProtectedRoute from './components/RouteComponents/ProtectedRoute';
 import LogoutComponent from './components/logout/LogoutComponent';
 import { ThemeProvider } from './theme/ThemeProvider';
+import axiosInstance, { Logout } from './axios/AxiosInstance';
+import { CircularProgress } from '@mui/material';
 
 const App = () => {
   const navigate = useNavigate();
   globalRouter.navigate = navigate;
 
+  const [isLoggedIn, setLoggedIn] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const response = await axiosInstance.get('users/getme');
+        const userIsLoggedIn = response.status === 200;
+
+        setLoggedIn(userIsLoggedIn);
+      } catch (err) {
+        Logout();
+        setLoggedIn(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  // Skall användas
   const [snackbarInfo, setSnackbarInfo] = useState({
     open: false,
     message: '',
@@ -38,37 +59,42 @@ const App = () => {
   return (
     <ThemeProvider>
       <div className="App">
-        <ResponsiveAppBar />
+        {isLoggedIn === null ? (
+          <CircularProgress></CircularProgress>
+        ) : (
+          <>
+            <ResponsiveAppBar />
+            <Routes>
+              <Route path="/login" element={<LoginComponent />} />
 
-        <Routes>
-          <Route path="/login" element={<LoginComponent />} />
-
-          <Route path="/" element={<HomeComponent />} />
-          <Route
-            path="/logout"
-            element={
-              <ProtectedRoute>
-                <LogoutComponent />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/users"
-            element={
-              <ProtectedRoute>
-                <UserComponent />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/account"
-            element={
-              <ProtectedRoute>
-                <AccountComponent showSnackbar={showSnackbar} />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+              <Route path="/" element={<HomeComponent />} />
+              <Route
+                path="/logout"
+                element={
+                  <ProtectedRoute>
+                    <LogoutComponent />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/users"
+                element={
+                  <ProtectedRoute>
+                    <UserComponent />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/account"
+                element={
+                  <ProtectedRoute>
+                    <AccountComponent showSnackbar={showSnackbar} />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </>
+        )}
       </div>
     </ThemeProvider>
   );

@@ -46,18 +46,19 @@ router
         if (!existingUser) {
           return res.status(404).json({ error: 'Användaren hittades inte.' });
         }
+
         const newName = req.body.name;
         const newEmail = req.body.email;
         const newPassword = req.body.password;
         const newRole = req.body.isAdmin;
 
-        newName ? (existingUser.name = newName) : '';
-        newEmail ? (existingUser.email = newEmail) : '';
-        newPassword ? (existingUser.password = newPassword) : '';
-        newRole ? (existingUser.isAdmin = newRole) : '';
+        newName && (existingUser.name = newName);
+        newEmail && (existingUser.email = newEmail);
+        newPassword && (existingUser.password = newPassword);
+        newRole !== undefined && (existingUser.isAdmin = newRole);
 
+        console.log(existingUser);
         const updatedUser = await existingUser.save();
-        console.log(updatedUser);
         res.status(200).json(updatedUser);
       } catch (error) {
         console.error('Error updating user: ', error);
@@ -74,7 +75,8 @@ router
         res.json(result);
       })
       .catch((err) => {
-        console.log(err);
+        if (token) invalidateToken(token);
+        res.send(err.status);
       });
   })
   .get('/logout', (req, res) => {
