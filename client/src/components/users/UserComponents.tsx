@@ -26,14 +26,17 @@ import EditIcon from '@mui/icons-material/Edit';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import UserCredentialsComponent from './usercredentials/UserCredentialsComponent';
+import { userRoleState } from '../../recoil/RecoilAtoms';
+import { useRecoilValue } from 'recoil';
 
 const UserComponent = () => {
   const [users, setUsers] = useState<Array<UserModel>>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [changeOpen, setChangeOpen] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
+
+  const { isAdmin } = useRecoilValue(userRoleState);
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
@@ -58,12 +61,13 @@ const UserComponent = () => {
 
       if (response.status === 200) {
         setUsers(response.data.users);
-        setIsAdmin(response.data.isAdmin);
+        // setIsAdmin(response.data.isAdmin);
         setLoading(false);
       }
     } catch (error) {
       const extendedError = error as ExtendedError;
       if (extendedError.showSnackbar) {
+        // snackbarlogic
       } else {
         console.error('Other error:', error);
       }
@@ -106,9 +110,11 @@ const UserComponent = () => {
               padding: 0,
               paddingLeft: '16px',
             }}>
-            <IconButton aria-label="expand row" size="small" onClick={handleOpen}>
-              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            </IconButton>
+            {isAdmin && (
+              <IconButton aria-label="expand row" size="small" onClick={handleOpen}>
+                {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
+            )}
           </TableCell>
           <TableCell component="th" scope="row">
             {row.name}
@@ -247,3 +253,6 @@ const UserComponent = () => {
 };
 
 export default UserComponent;
+function useRecoildValue(userRoleState: any) {
+  throw new Error('Function not implemented.');
+}

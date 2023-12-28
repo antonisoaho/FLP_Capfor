@@ -20,6 +20,8 @@ import CreateUserModel from './models/CreateUserModel';
 import axiosInstance from '../../../axios/AxiosInstance';
 import { VisibilityOff, Visibility } from '@mui/icons-material';
 import axios from 'axios';
+import { useSetRecoilState } from 'recoil';
+import { snackbarState } from '../../../recoil/RecoilAtoms';
 
 interface CreateUserComponentProps {
   onUserCreated: () => void;
@@ -31,10 +33,9 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({ onUserCreated
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [name, setName] = useState<string>('');
   const [createAdmin, setCreateAdmin] = useState<boolean>(false);
-  const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
   const [showPassword, setShowPassword] = React.useState(false);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  const setSnackbarState = useSetRecoilState(snackbarState);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -54,7 +55,11 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({ onUserCreated
       });
 
       if (response?.status === 201) {
-        setShowSuccessMessage(true);
+        setSnackbarState({
+          open: true,
+          message: 'Konto skapat.',
+          severity: 'success',
+        });
         setName('');
         setEmail('');
         setPassword('');
@@ -64,37 +69,27 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({ onUserCreated
       } else {
         // Annat fel
         const errorMessage = 'Ett fel inträffade. Försök igen senare.';
-
-        setErrorMessage(errorMessage);
-        setShowErrorMessage(true);
       }
     } catch (error) {
       console.error('Oväntat fel:', error);
-
+      let errorMessage: string;
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 409) {
-          const errorMessage = error.response?.data.error || 'Email finns redan registrerad.';
-          setErrorMessage(errorMessage);
+          errorMessage = error.response?.data.error || 'Email finns redan registrerad.';
         } else {
-          setErrorMessage('Ett fel inträffade. Försök igen senare.');
+          errorMessage = 'Ett fel inträffade. Försök igen senare.';
         }
-
-        setShowErrorMessage(true);
       } else {
-        setErrorMessage('Kunde inte ansluta till servern.');
-        setShowErrorMessage(true);
+        errorMessage = 'Kunde inte ansluta till servern.';
       }
+      setSnackbarState({
+        open: true,
+        message: errorMessage,
+        severity: 'error',
+      });
     }
   };
 
-  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setShowErrorMessage(false);
-    setShowSuccessMessage(false);
-    setErrorMessage('');
-  };
   return (
     <Container
       component="main"
@@ -214,16 +209,6 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({ onUserCreated
           </CardContent>
         </Card>
       </Box>
-      <Snackbar open={showErrorMessage} autoHideDuration={4000} onClose={handleClose}>
-        <Alert severity="error" onClose={handleClose}>
-          {errorMessage || 'Något gick snett..'}
-        </Alert>
-      </Snackbar>
-      <Snackbar open={showSuccessMessage} autoHideDuration={4000} onClose={handleClose}>
-        <Alert severity="success" onClose={handleClose}>
-          Användare skapad.
-        </Alert>
-      </Snackbar>
     </Container>
   );
 };

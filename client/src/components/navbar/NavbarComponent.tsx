@@ -34,12 +34,8 @@ const ResponsiveAppBar = () => {
   const token = localStorage.getItem('TOKEN');
 
   const { toggleTheme, isDarkMode } = useTheme();
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-    null
-  );
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
-    null
-  );
+  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
+  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
   const toggleDarkMode = () => {
     toggleTheme();
@@ -77,8 +73,7 @@ const ResponsiveAppBar = () => {
               letterSpacing: '.3rem',
               color: 'inherit',
               textDecoration: 'none',
-            }}
-          >
+            }}>
             GoLife
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -88,8 +83,7 @@ const ResponsiveAppBar = () => {
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
-              color="inherit"
-            >
+              color="inherit">
               <MenuIcon />
             </IconButton>
             <Menu
@@ -108,16 +102,14 @@ const ResponsiveAppBar = () => {
               onClose={handleCloseNavMenu}
               sx={{
                 display: { xs: 'block', md: 'none' },
-              }}
-            >
+              }}>
               {pages.map((page) =>
                 (page.protected && token) || !page.protected ? (
                   <MenuItem
                     key={page.title}
                     onClick={handleCloseNavMenu}
                     to={page.link}
-                    component={Link}
-                  >
+                    component={Link}>
                     <Typography textAlign="center">{page.title}</Typography>
                   </MenuItem>
                 ) : null
@@ -138,8 +130,7 @@ const ResponsiveAppBar = () => {
               letterSpacing: '.3rem',
               color: 'inherit',
               textDecoration: 'none',
-            }}
-          >
+            }}>
             GoLife
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
@@ -151,8 +142,7 @@ const ResponsiveAppBar = () => {
                   onClick={handleCloseNavMenu}
                   to={page.link}
                   component={Link}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
-                >
+                  sx={{ my: 2, color: 'white', display: 'block' }}>
                   {page.title}
                 </Button>
               ) : null
@@ -162,9 +152,7 @@ const ResponsiveAppBar = () => {
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Öppna inställningar">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar>
-                    {username ? username.substring(0, 1).toUpperCase() : '-'}
-                  </Avatar>
+                  <Avatar>{username ? username.substring(0, 1).toUpperCase() : '-'}</Avatar>
                 </IconButton>
               </Tooltip>
               <Menu
@@ -181,15 +169,13 @@ const ResponsiveAppBar = () => {
                   horizontal: 'right',
                 }}
                 open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
+                onClose={handleCloseUserMenu}>
                 <MenuItem
                   key="themetoggler"
                   onClick={() => {
                     toggleDarkMode();
                     handleCloseUserMenu();
-                  }}
-                >
+                  }}>
                   <Typography textAlign="center">{'Mörkt tema'}</Typography>
                   <ListItemIcon sx={{ ml: 1 }} color="inherit">
                     {isDarkMode ? <Brightness7Icon /> : <Brightness4Icon />}
@@ -200,8 +186,7 @@ const ResponsiveAppBar = () => {
                     key={setting.title}
                     to={setting.link}
                     component={Link}
-                    onClick={handleCloseUserMenu}
-                  >
+                    onClick={handleCloseUserMenu}>
                     <Typography textAlign="center">{setting.title}</Typography>
                   </MenuItem>
                 ))}
@@ -212,8 +197,7 @@ const ResponsiveAppBar = () => {
               LinkComponent={Link}
               to={'/login'}
               component={Link}
-              sx={{ my: 2, color: 'white', display: 'block' }}
-            >
+              sx={{ my: 2, color: 'white', display: 'block' }}>
               Logga in
             </Button>
           )}

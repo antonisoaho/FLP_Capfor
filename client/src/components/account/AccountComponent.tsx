@@ -2,19 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance, { ExtendedError } from '../../axios/AxiosInstance';
 import { Container, Box } from '@mui/material';
 import AccountModel from './models/AccountModel';
+import { useSetRecoilState } from 'recoil';
+import { snackbarState } from '../../recoil/RecoilAtoms';
 
-interface AccountComponentProps {
-  showSnackbar: (
-    message: string,
-    type: 'success' | 'error' | 'info' | 'warning'
-  ) => void;
-}
-
-const AccountComponent: React.FC<AccountComponentProps> = ({
-  showSnackbar,
-}) => {
+const AccountComponent = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [account, setAccount] = useState<AccountModel | undefined>(undefined);
+  const setSnackbarState = useSetRecoilState(snackbarState);
 
   useEffect(() => {
     const getMyAccount = async () => {
@@ -27,17 +21,18 @@ const AccountComponent: React.FC<AccountComponentProps> = ({
       } catch (error) {
         const extendedError = error as ExtendedError;
         if (extendedError.showSnackbar) {
-          showSnackbar(
-            extendedError.snackbarMessage || 'Ett fel inträffade',
-            'error'
-          );
+          setSnackbarState({
+            open: true,
+            message: extendedError.snackbarMessage || 'Ett fel inträffade',
+            severity: 'error',
+          });
         } else {
           console.error('Other error:', error);
         }
       }
     };
     getMyAccount();
-  }, [showSnackbar]);
+  }, []);
 
   const changePassword = () => {
     // Lägg in en childComponent

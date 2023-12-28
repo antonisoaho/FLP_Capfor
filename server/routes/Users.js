@@ -57,12 +57,26 @@ router
         newPassword && (existingUser.password = newPassword);
         newRole !== undefined && (existingUser.isAdmin = newRole);
 
-        console.log(existingUser);
         const updatedUser = await existingUser.save();
         res.status(200).json(updatedUser);
       } catch (error) {
         console.error('Error updating user: ', error);
         res.status(500).json({ error: 'Ett fel inträffade vid uppdatering av användaren.' });
+      }
+    }
+  })
+  .delete('/singleuser/:id', async (req, res) => {
+    const userId = req.params.id;
+    const { isAdmin } = req.user;
+
+    if (isAdmin) {
+      try {
+        await User.findByIdAndDelete(userId);
+
+        res.status(200).json({ success: 'Användare borttagen' });
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(500).json({ error: 'Ett fel inträffade vid borttagning av användare.' });
       }
     }
   })
@@ -86,7 +100,7 @@ router
 
     res.status(200).send();
   })
-  .post('/createuser', auth, async (req, res) => {
+  .post('/createuser', async (req, res) => {
     try {
       const existingUser = await User.findOne({ email: req.body.email });
       if (existingUser) {

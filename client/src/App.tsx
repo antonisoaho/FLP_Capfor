@@ -16,53 +16,43 @@ import LogoutComponent from './components/logout/LogoutComponent';
 import { ThemeProvider } from './theme/ThemeProvider';
 import axiosInstance, { Logout } from './axios/AxiosInstance';
 import { CircularProgress } from '@mui/material';
+import CustomerComponent from './components/customers/CustomerComponent';
+import { useSetRecoilState } from 'recoil';
+import { userRoleState } from './recoil/RecoilAtoms';
+import SnackbarComponent from './components/snackbar/SnackbarComponent';
 
 const App = () => {
   const navigate = useNavigate();
   globalRouter.navigate = navigate;
-
-  const [isLoggedIn, setLoggedIn] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const setUserRole = useSetRecoilState(userRoleState);
 
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        const response = await axiosInstance.get('users/getme');
-        const userIsLoggedIn = response.status === 200;
-
-        setLoggedIn(userIsLoggedIn);
-      } catch (err) {
-        Logout();
-        setLoggedIn(false);
+    const checkUserLogin = async () => {
+      if (localStorage.getItem('TOKEN')) {
+        try {
+          const userRoleData = await axiosInstance.get('users/getme');
+          setUserRole({ loggedIn: true, isAdmin: userRoleData.data.isAdmin });
+        } catch (error) {
+          Logout();
+        }
       }
+      setLoading(false);
     };
 
-    checkLoginStatus();
+    checkUserLogin();
   }, []);
-
-  // Skall användas
-  const [snackbarInfo, setSnackbarInfo] = useState({
-    open: false,
-    message: '',
-    type: 'success',
-    onClose: () => setSnackbarInfo((prev) => ({ ...prev, open: false })),
-  });
-
-  const showSnackbar = (message: string, type: 'success' | 'error' | 'info' | 'warning') => {
-    setSnackbarInfo({
-      open: true,
-      message,
-      type,
-      onClose: () => setSnackbarInfo((prev) => ({ ...prev, open: false })),
-    });
-  };
 
   return (
     <ThemeProvider>
       <div className="App">
-        {isLoggedIn === null ? (
-          <CircularProgress></CircularProgress>
+        {loading ? (
+          <>
+            <CircularProgress></CircularProgress>
+          </>
         ) : (
           <>
+            <SnackbarComponent />
             <ResponsiveAppBar />
             <Routes>
               <Route path="/login" element={<LoginComponent />} />
@@ -85,10 +75,18 @@ const App = () => {
                 }
               />
               <Route
+                path="/customers"
+                element={
+                  <ProtectedRoute>
+                    <CustomerComponent />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/account"
                 element={
                   <ProtectedRoute>
-                    <AccountComponent showSnackbar={showSnackbar} />
+                    <AccountComponent />
                   </ProtectedRoute>
                 }
               />

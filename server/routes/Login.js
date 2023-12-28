@@ -40,14 +40,14 @@ router
           loggedInUser.token = token;
           res.status(200).json(loggedInUser);
         } else {
-          res.status(404).send('User not found');
+          res.status(404).json({ error: 'Användaren finns inte.' });
         }
       } else {
-        res.status(400).send('Wrong password');
+        res.status(400).json({ error: 'Fel lösenord.' });
       }
     } catch (error) {
       console.error('Error during login: ', error);
-      res.status(500).send('Internal Server error');
+      res.status(500).json({ error: 'Internal Server Error.' });
     }
   });
 
