@@ -1,18 +1,18 @@
 // LogoutComponent.jsx
 import React, { useEffect, useState } from 'react';
 import { Logout } from '../../axios/AxiosInstance';
-import { Alert, Container, Snackbar } from '@mui/material';
+import { Container } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
-import { snackbarState, userRoleState } from '../../recoil/RecoilAtoms';
+import { snackbarState, userState } from '../../recoil/RecoilAtoms';
 
 const LogoutComponent = () => {
   const navigate = useNavigate();
-  const setLoginState = useSetRecoilState(userRoleState);
-  const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(true);
+  const setLoginState = useSetRecoilState(userState);
   const setSnackbarState = useSetRecoilState(snackbarState);
+
   useEffect(() => {
-    setLoginState({ loggedIn: false, isAdmin: false });
+    setLoginState({ loggedIn: false, isAdmin: false, userId: '' });
 
     setSnackbarState({
       open: true,
@@ -24,14 +24,6 @@ const LogoutComponent = () => {
       navigate('/');
     }, 1200);
   }, []);
-
-  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setShowSuccessMessage(false);
-  };
 
   return <Container></Container>;
 };

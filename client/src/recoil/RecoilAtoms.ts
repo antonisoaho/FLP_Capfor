@@ -1,8 +1,12 @@
 import { atom } from 'recoil';
 
-export const userRoleState = atom({
+export const userState = atom({
   key: 'userRole',
-  default: { loggedIn: false, isAdmin: false },
+  default: {
+    loggedIn: false,
+    isAdmin: false,
+    userId: '',
+  },
 });
 
 export const snackbarState = atom({

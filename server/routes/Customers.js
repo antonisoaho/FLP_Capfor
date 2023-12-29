@@ -18,10 +18,10 @@ router
         lastUpdate: cust.updatedAt,
       }));
 
-      res.json({ advisor: userId, customers: parsedResult });
+      res.send(parsedResult);
     } catch (err) {
       console.error(err);
-      res.status(500).json(err);
+      res.status(500).json({ error: 'Fel vid inhämtning av kunder.' });
     }
   })
   .post('/create', async (req, res) => {
@@ -29,7 +29,7 @@ router
       const customer = new Customer({ ...req.body });
       const result = await customer.save();
 
-      res.status(201).json({ success: true, customer: result.customerDetails.name });
+      res.status(201).send(result.customerDetails.name);
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Internal Server Error' });

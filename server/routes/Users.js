@@ -17,10 +17,10 @@ router
           isAdmin: person.isAdmin,
         }));
 
-        res.json({ userId, isAdmin, users: parsedResult });
+        res.send(parsedResult);
       })
       .catch((err) => {
-        console.log(err);
+        res.status(500).json({ error: 'Ett fel inträffade vid hämtning av användare.' });
       });
   })
   .get('/singleuser/:id', (req, res) => {
@@ -32,7 +32,7 @@ router
           res.json(result);
         })
         .catch((err) => {
-          console.log(err);
+          res.status(500).json({ error: 'Fel vid inläsning av användare.' });
         });
     }
   })
@@ -60,7 +60,6 @@ router
         const updatedUser = await existingUser.save();
         res.status(200).json(updatedUser);
       } catch (error) {
-        console.error('Error updating user: ', error);
         res.status(500).json({ error: 'Ett fel inträffade vid uppdatering av användaren.' });
       }
     }

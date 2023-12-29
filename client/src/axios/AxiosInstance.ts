@@ -1,7 +1,8 @@
 import axios, { AxiosError } from 'axios';
 import globalRouter from '../../src/globalRouter';
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import { userRoleState } from '../recoil/RecoilAtoms';
+import { userState } from '../recoil/RecoilAtoms';
+import { ErrorResponse } from 'react-router-dom';
 
 export interface ExtendedError extends AxiosError {
   showSnackbar?: boolean;

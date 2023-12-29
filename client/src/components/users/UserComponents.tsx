@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import UserModel from './models/UserModel';
-import axiosInstance, { ExtendedError } from '../../axios/AxiosInstance';
 import CreateUserComponent from './createUser/CreateUserComponent';
 import {
   Box,
@@ -26,8 +25,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import UserCredentialsComponent from './usercredentials/UserCredentialsComponent';
-import { userRoleState } from '../../recoil/RecoilAtoms';
-import { useRecoilValue } from 'recoil';
+import { snackbarState, userState } from '../../recoil/RecoilAtoms';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { getSingleUserById, getUserList } from '../../apiCalls/apiUserCalls';
 
 const UserComponent = () => {
   const [users, setUsers] = useState<Array<UserModel>>([]);
@@ -35,8 +35,9 @@ const UserComponent = () => {
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [changeOpen, setChangeOpen] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
+  const setSnackbarState = useSetRecoilState(snackbarState);
 
-  const { isAdmin } = useRecoilValue(userRoleState);
+  const { isAdmin } = useRecoilValue(userState);
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
@@ -56,21 +57,17 @@ const UserComponent = () => {
 
   const getUsers = async () => {
     setLoading(true);
-    try {
-      const response = await axiosInstance.get('/users');
+    const response = await getUserList();
 
-      if (response.status === 200) {
-        setUsers(response.data.users);
-        // setIsAdmin(response.data.isAdmin);
-        setLoading(false);
-      }
-    } catch (error) {
-      const extendedError = error as ExtendedError;
-      if (extendedError.showSnackbar) {
-        // snackbarlogic
-      } else {
-        console.error('Other error:', error);
-      }
+    if (response.success && response.status === 200) {
+      setUsers(response.data!);
+      setLoading(false);
+    } else {
+      setSnackbarState({
+        open: true,
+        message: response.error!,
+        severity: 'error',
+      });
     }
   };
 
@@ -88,12 +85,20 @@ const UserComponent = () => {
 
     const handleOpen = async () => {
       if (!open && !row.email) {
-        const response = await axiosInstance.get(`/users/singleuser/${row._id}`);
-        const user = response.data;
-        const objIndex = users.findIndex((obj) => obj._id === row._id);
-        users[objIndex].email = user.email;
-        users[objIndex].updatedAt = user.updatedAt;
-        users[objIndex].createdAt = user.createdAt;
+        const response = await getSingleUserById(row._id);
+        if (response.success && response.status === 200) {
+          const user = response.data;
+          const objIndex = users.findIndex((obj) => obj._id === row._id);
+          users[objIndex].email = user!.email;
+          users[objIndex].updatedAt = user!.updatedAt;
+          users[objIndex].createdAt = user!.createdAt;
+        } else {
+          setSnackbarState({
+            open: true,
+            message: response.error!,
+            severity: 'error',
+          });
+        }
       }
 
       setOpen(!open);
@@ -149,8 +154,8 @@ const UserComponent = () => {
                     <TableRow>
                       <TableCell>{row._id}</TableCell>
                       <TableCell>{row.email}</TableCell>
-                      <TableCell>{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
-                      <TableCell>{new Date(row.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell>{new Date(row.updatedAt!).toLocaleDateString()}</TableCell>
+                      <TableCell>{new Date(row.createdAt!).toLocaleDateString()}</TableCell>
                       <TableCell />
                     </TableRow>
                   </TableBody>
@@ -253,6 +258,6 @@ const UserComponent = () => {
 };
 
 export default UserComponent;
-function useRecoildValue(userRoleState: any) {
+function useRecoildValue(userState: any) {
   throw new Error('Function not implemented.');
 }

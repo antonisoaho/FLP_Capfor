@@ -18,21 +18,25 @@ import axiosInstance, { Logout } from './axios/AxiosInstance';
 import { CircularProgress } from '@mui/material';
 import CustomerComponent from './components/customers/CustomerComponent';
 import { useSetRecoilState } from 'recoil';
-import { userRoleState } from './recoil/RecoilAtoms';
+import { userState } from './recoil/RecoilAtoms';
 import SnackbarComponent from './components/snackbar/SnackbarComponent';
 
 const App = () => {
   const navigate = useNavigate();
   globalRouter.navigate = navigate;
   const [loading, setLoading] = useState<boolean>(true);
-  const setUserRole = useSetRecoilState(userRoleState);
+  const setUser = useSetRecoilState(userState);
 
   useEffect(() => {
     const checkUserLogin = async () => {
       if (localStorage.getItem('TOKEN')) {
         try {
           const userRoleData = await axiosInstance.get('users/getme');
-          setUserRole({ loggedIn: true, isAdmin: userRoleData.data.isAdmin });
+          setUser({
+            loggedIn: true,
+            isAdmin: userRoleData.data.isAdmin,
+            userId: userRoleData.data.roleId,
+          });
         } catch (error) {
           Logout();
         }

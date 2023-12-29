@@ -1,81 +1,62 @@
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Container,
-  Snackbar,
-  TextField,
-} from '@mui/material';
+import { Box, Button, Card, CardActions, CardContent, Container, TextField } from '@mui/material';
 import React, { useState, KeyboardEvent, FormEvent } from 'react';
 import axiosInstance, { ExtendedError } from '../../axios/AxiosInstance';
 import LoginResponse from './models/LoginResponse';
 import globalRouter from '../../globalRouter';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { userRoleState } from '../../recoil/RecoilAtoms';
+import { useSetRecoilState } from 'recoil';
+import { snackbarState, userState } from '../../recoil/RecoilAtoms';
+import { loginAPI } from '../../apiCalls/apiUserCalls';
 
 const LoginComponent: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
-  const [showErrorAccept, setShowErrorAccept] = useState<boolean>(false);
-  const setUserRole = useSetRecoilState(userRoleState);
+  const setUser = useSetRecoilState(userState);
+  const setSnackbarState = useSetRecoilState(snackbarState);
 
   const navigate = useNavigate();
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
-      event.preventDefault(); // Prevent form submission on Enter key
+      event.preventDefault();
       Login();
     }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Prevent default form submission behavior
+    event.preventDefault();
     Login();
   };
 
   const Login = async () => {
-    try {
-      const response = await axiosInstance.post<LoginResponse>('/login', {
-        email,
-        password,
+    const response = await loginAPI(email, password);
+    if (response.success && response.status === 200) {
+      setSnackbarState({
+        open: response.success,
+        message: `Välkommen, ${response.data?.name || 'inloggning lyckades'}.`,
+        severity: 'success',
       });
-      if (response.status === 200) {
-        setShowSuccessMessage(true);
 
-        localStorage.setItem('TOKEN', response.data.token);
-        localStorage.setItem('USERNAME', response.data.name);
-        setUserRole({ loggedIn: true, isAdmin: response.data.isAdmin });
-        navigate('/');
+      localStorage.setItem('TOKEN', response.data!.token);
+      localStorage.setItem('USERNAME', response.data!.name);
 
-        if (globalRouter.navigate) globalRouter.navigate('/');
-      } else {
-        setShowErrorMessage(true);
-      }
-    } catch (error) {
-      const extendedError = error as ExtendedError;
-      if (extendedError.showSnackbar) {
-        setShowErrorMessage(true);
-      } else {
-        console.error('Other error:', error);
-      }
+      setUser({
+        loggedIn: true,
+        isAdmin: response.data!.isAdmin,
+        userId: response.data!.userId,
+      });
+      navigate('/');
+
+      if (globalRouter.navigate) globalRouter.navigate('/');
+    } else {
+      setSnackbarState({
+        open: true,
+        message: response.error!,
+        severity: 'error',
+      });
     }
   };
 
-  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setShowErrorMessage(false);
-    setShowSuccessMessage(false);
-    setShowErrorAccept(false);
-  };
   return (
     <Container component="main" maxWidth="xs">
       <Box
@@ -119,16 +100,6 @@ const LoginComponent: React.FC = () => {
           </form>
         </Card>
       </Box>
-      <Snackbar open={showErrorMessage} autoHideDuration={4000} onClose={handleClose}>
-        <Alert severity="error" onClose={handleClose}>
-          Fel användarnamn eller lösenord.
-        </Alert>
-      </Snackbar>
-      <Snackbar open={showSuccessMessage} autoHideDuration={4000} onClose={handleClose}>
-        <Alert severity="success" onClose={handleClose}>
-          Lyckad inloggning!
-        </Alert>
-      </Snackbar>
     </Container>
   );
 };

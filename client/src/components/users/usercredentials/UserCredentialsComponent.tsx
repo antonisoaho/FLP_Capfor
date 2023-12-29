@@ -10,14 +10,12 @@ import {
   CardActions,
   Button,
   Select,
-  Alert,
   Container,
-  Snackbar,
 } from '@mui/material';
 import React, { useState } from 'react';
-import axiosInstance from '../../../axios/AxiosInstance';
-import UpdateUserModel from './models/UpdateUserModel';
-import axios from 'axios';
+import { useSetRecoilState } from 'recoil';
+import { snackbarState } from '../../../recoil/RecoilAtoms';
+import { updateSingleUserById } from '../../../apiCalls/apiUserCalls';
 
 export interface UserCredentialsProps {
   onUserChanged: () => void;
@@ -37,52 +35,36 @@ const UserCredentialsComponent: React.FC<UserCredentialsProps> = ({
   const [name, setName] = useState<string>(initialName);
   const [email, setEmail] = useState<string>(initialEmail);
   const [password, setPassword] = useState<string>('');
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(initialIsAdmin);
-  const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const setSnackbarState = useSetRecoilState(snackbarState);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const updateUser = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    try {
-      const response = await axiosInstance.put<UpdateUserModel>(`users/singleuser/${_id}`, {
-        ...(name && { name }),
-        ...(email && { email }),
-        ...(password && { password }),
-        ...(typeof isAdmin === 'boolean' && { isAdmin }),
+    const response = await updateSingleUserById(_id, {
+      ...(name && { name }),
+      ...(email && { email }),
+      ...(password && { password }),
+      ...(typeof isAdmin === 'boolean' && { isAdmin }),
+    });
+
+    if (response.success && response.status === 200) {
+      setSnackbarState({
+        open: true,
+        message: `${name}'s konto ändrat.`,
+        severity: 'info',
       });
-
-      if (response?.status === 200) {
-        setShowSuccessMessage(true);
-        setPassword('');
-        onUserChanged();
-      } else {
-        // Annat fel
-        const errorMessage = 'Ett fel inträffade. Försök igen senare.';
-
-        setErrorMessage(errorMessage);
-        setShowErrorMessage(true);
-      }
-    } catch (error) {
-      console.error('Oväntat fel:', error);
-
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 409) {
-          const errorMessage = error.response?.data.error || 'Email finns redan registrerad.';
-          setErrorMessage(errorMessage);
-        } else {
-          setErrorMessage('Ett fel inträffade. Försök igen senare.');
-        }
-
-        setShowErrorMessage(true);
-      } else {
-        setErrorMessage('Kunde inte ansluta till servern.');
-        setShowErrorMessage(true);
-      }
+      setPassword('');
+      onUserChanged();
+    } else {
+      setSnackbarState({
+        open: true,
+        message: response.error!,
+        severity: 'error',
+      });
     }
   };
 
@@ -90,14 +72,6 @@ const UserCredentialsComponent: React.FC<UserCredentialsProps> = ({
     event.preventDefault();
   };
 
-  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setShowErrorMessage(false);
-    setShowSuccessMessage(false);
-    setErrorMessage('');
-  };
   return (
     <Container>
       <CardContent
@@ -183,16 +157,6 @@ const UserCredentialsComponent: React.FC<UserCredentialsProps> = ({
           </CardActions>
         </form>
       </CardContent>
-      <Snackbar open={showErrorMessage} autoHideDuration={4000} onClose={handleClose}>
-        <Alert severity="error" onClose={handleClose}>
-          {errorMessage || 'Något gick snett..'}
-        </Alert>
-      </Snackbar>
-      <Snackbar open={showSuccessMessage} autoHideDuration={4000} onClose={handleClose}>
-        <Alert severity="success" onClose={handleClose}>
-          Användare uppdaterad.
-        </Alert>
-      </Snackbar>
     </Container>
   );
 };

@@ -69,6 +69,12 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({ onUserCreated
       } else {
         // Annat fel
         const errorMessage = 'Ett fel inträffade. Försök igen senare.';
+
+        setSnackbarState({
+          open: true,
+          message: errorMessage,
+          severity: 'error',
+        });
       }
     } catch (error) {
       console.error('Oväntat fel:', error);

@@ -43,7 +43,7 @@ router
           res.status(404).json({ error: 'Användaren finns inte.' });
         }
       } else {
-        res.status(400).json({ error: 'Fel lösenord.' });
+        res.status(400).json({ error: 'Fel användarnamn eller lösenord.' });
       }
     } catch (error) {
       console.error('Error during login: ', error);

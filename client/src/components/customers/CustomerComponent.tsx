@@ -17,53 +17,47 @@ import axiosInstance, { ExtendedError } from '../../axios/AxiosInstance';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import AdvisorModel from './models/AdvisorModel';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { snackbarState, userState } from '../../recoil/RecoilAtoms';
+import { getUserList } from '../../apiCalls/apiUserCalls';
+import UserModel from '../users/models/UserModel';
+import { getCustomerList } from '../../apiCalls/apiCustomerCalls';
 
 const CustomerComponent = () => {
   const [customers, setCustomers] = useState<Array<CustomerModel>>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [selectedCustomer, setSelectedCustoemr] = useState<CustomerModel | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerModel | null>(null);
   const [selectedAdvisor, setSelectedAdvisor] = useState<any>(-1);
-  const [advisorList, setAdvisorList] = useState<AdvisorModel[] | null>(null);
+  const [advisorList, setAdvisorList] = useState<UserModel[] | null>(null);
+  const { isAdmin, userId } = useRecoilValue(userState);
+  const setSnackbarState = useSetRecoilState(snackbarState);
 
   const populateAdvisors = async () => {
-    try {
-      const response = await axiosInstance.get('/users');
+    const response = await getUserList();
 
-      if (response.status === 200) {
-        setAdvisorList(response.data.users);
-      }
-    } catch (error) {
-      const extendedError = error as ExtendedError;
-      if (extendedError.showSnackbar) {
-        //same snackbar logic
-      } else {
-        console.error('Other error:', error);
-      }
+    if (response.success && response.status === 200) {
+      setAdvisorList(response.data!);
+      setLoading(false);
+    } else {
+      setSnackbarState({
+        open: true,
+        message: response.error!,
+        severity: 'error',
+      });
     }
   };
 
   const getCustomers = async () => {
-    setLoading(true);
-    try {
-      const response = await axiosInstance.get('/customers');
+    const response = await getCustomerList();
 
-      if (response.status === 200) {
-        setCustomers(response.data.customers);
-        // console.log(advisorList);
-        if (advisorList !== null) {
-          setSelectedAdvisor(
-            advisorList!.findIndex((advisor: AdvisorModel) => advisor._id === response.data.advisor)
-          );
-        }
-        console.log(selectedAdvisor);
-      }
-    } catch (error) {
-      const extendedError = error as ExtendedError;
-      if (extendedError.showSnackbar) {
-        // snackbarlogic
-      } else {
-        console.error('Other error:', error);
-      }
+    if (response.success && response.status === 200) {
+      setCustomers(response.data!);
+    } else {
+      setSnackbarState({
+        open: true,
+        message: response.error!,
+        severity: 'error',
+      });
     }
   };
 
@@ -73,6 +67,7 @@ const CustomerComponent = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     populateAdvisors();
     getCustomers();
     setLoading(false);
