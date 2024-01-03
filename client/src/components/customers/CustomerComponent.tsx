@@ -4,6 +4,7 @@ import {
   CardContent,
   CircularProgress,
   Container,
+  Grid,
   IconButton,
   MenuItem,
   Select,
@@ -11,12 +12,10 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import CustomerModel from './models/CustomerModel';
-import axiosInstance, { ExtendedError } from '../../axios/AxiosInstance';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import AdvisorModel from './models/AdvisorModel';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { snackbarState, userState } from '../../recoil/RecoilAtoms';
 import { getUserList } from '../../apiCalls/apiUserCalls';
@@ -77,58 +76,62 @@ const CustomerComponent = () => {
     <Container sx={{ marginTop: 2 }}>
       {!loading ? (
         <>
-          <Select
-            labelId="advisorIds"
-            id="selectedAdvisor"
-            value={selectedAdvisor}
-            onChange={(event) => {
-              handleAdvisor(event);
-            }}>
-            <MenuItem value={-1} key={'allAdvisors'}>
-              Alla
-            </MenuItem>
-            {advisorList?.map((advisor, index) => (
-              <MenuItem value={index} key={advisor._id}>
-                {advisor.name}
+          {isAdmin && (
+            <Select
+              labelId="advisorIds"
+              id="selectedAdvisor"
+              value={selectedAdvisor}
+              onChange={(event) => {
+                handleAdvisor(event);
+              }}>
+              <MenuItem value={-1} key={'allAdvisors'}>
+                Alla
               </MenuItem>
-            ))}
-          </Select>
-          <Container>
+              {advisorList?.map((advisor, index) => (
+                <MenuItem value={index} key={advisor._id}>
+                  {advisor.name}
+                </MenuItem>
+              ))}
+            </Select>
+          )}
+          <Grid justifyContent="center" container spacing={2} marginTop={1}>
             {customers.map(
               (cust) =>
                 advisorList &&
                 (selectedAdvisor === -1 || cust.advisorId === advisorList[selectedAdvisor]._id) && (
-                  <Card sx={{ maxWidth: 275 }} key={cust.custId}>
-                    <CardContent>
-                      <Typography
-                        textAlign="left"
-                        sx={{ fontSize: 14 }}
-                        color="text.secondary"
-                        gutterBottom>
-                        {cust.custId}
-                      </Typography>
-                      {cust.customerNames.map((name) => (
-                        <Typography key={name} textAlign="left">
-                          {name}
+                  <Grid item sx={{ maxWidth: 275 }} key={cust.custId}>
+                    <Card>
+                      <CardContent>
+                        <Typography
+                          textAlign="left"
+                          sx={{ fontSize: 14 }}
+                          color="text.secondary"
+                          gutterBottom>
+                          {cust.custId}
                         </Typography>
-                      ))}
-                    </CardContent>
-                    <CardActions>
-                      <Tooltip title={'Ändra kund'}>
-                        <IconButton sx={{ marginLeft: 'auto' }}>
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title={'Titta på kund'}>
-                        <IconButton>
-                          <VisibilityIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </CardActions>
-                  </Card>
+                        {cust.customerNames.map((name) => (
+                          <Typography key={name} textAlign="left">
+                            {name}
+                          </Typography>
+                        ))}
+                      </CardContent>
+                      <CardActions>
+                        <Tooltip title={'Ändra kund'}>
+                          <IconButton sx={{ marginLeft: 'auto' }}>
+                            <EditIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={'Titta på kund'}>
+                          <IconButton>
+                            <VisibilityIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </CardActions>
+                    </Card>
+                  </Grid>
                 )
             )}
-          </Container>
+          </Grid>
         </>
       ) : (
         <CircularProgress />

@@ -1,5 +1,4 @@
 import {
-  Alert,
   Box,
   Button,
   Card,
@@ -13,27 +12,28 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
-  Snackbar,
 } from '@mui/material';
 import React, { useState } from 'react';
 import CreateUserModel from './models/CreateUserModel';
-import axiosInstance from '../../../axios/AxiosInstance';
 import { VisibilityOff, Visibility } from '@mui/icons-material';
-import axios from 'axios';
 import { useSetRecoilState } from 'recoil';
 import { snackbarState } from '../../../recoil/RecoilAtoms';
+import { createNewUser } from '../../../apiCalls/apiUserCalls';
 
 interface CreateUserComponentProps {
   onUserCreated: () => void;
 }
 
 const CreateUserComponent: React.FC<CreateUserComponentProps> = ({ onUserCreated }) => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [name, setName] = useState<string>('');
-  const [createAdmin, setCreateAdmin] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = React.useState(false);
+  const initialUserModel: CreateUserModel = {
+    name: '',
+    email: '',
+    password: '',
+    isAdmin: false,
+  };
+
+  const [userModel, setUserModel] = useState<CreateUserModel>(initialUserModel);
+  const [showPassword, setShowPassword] = useState(false);
 
   const setSnackbarState = useSetRecoilState(snackbarState);
 
@@ -43,54 +43,31 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({ onUserCreated
     event.preventDefault();
   };
 
+  const handleInputChange = (field: string, value: string | boolean) => {
+    setUserModel((prevUserModel) => ({
+      ...prevUserModel,
+      [field]: value,
+    }));
+  };
+
   const CreateUser = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    try {
-      const response = await axiosInstance.post<CreateUserModel>('/users/createuser', {
-        name,
-        email,
-        password,
-        createAdmin,
-      });
+    const response = await createNewUser(userModel);
 
-      if (response?.status === 201) {
-        setSnackbarState({
-          open: true,
-          message: 'Konto skapat.',
-          severity: 'success',
-        });
-        setName('');
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
-        setCreateAdmin(false);
-        onUserCreated();
-      } else {
-        // Annat fel
-        const errorMessage = 'Ett fel inträffade. Försök igen senare.';
-
-        setSnackbarState({
-          open: true,
-          message: errorMessage,
-          severity: 'error',
-        });
-      }
-    } catch (error) {
-      console.error('Oväntat fel:', error);
-      let errorMessage: string;
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 409) {
-          errorMessage = error.response?.data.error || 'Email finns redan registrerad.';
-        } else {
-          errorMessage = 'Ett fel inträffade. Försök igen senare.';
-        }
-      } else {
-        errorMessage = 'Kunde inte ansluta till servern.';
-      }
+    if (response.success && response.status === 201) {
       setSnackbarState({
         open: true,
-        message: errorMessage,
+        message: `Konto åt ${response.data!.name} skapat.`,
+        severity: 'success',
+      });
+
+      setUserModel(initialUserModel);
+      onUserCreated();
+    } else {
+      setSnackbarState({
+        open: true,
+        message: response.error!,
         severity: 'error',
       });
     }
@@ -125,9 +102,9 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({ onUserCreated
                 <OutlinedInput
                   id="name"
                   type="text"
-                  value={name}
+                  value={userModel.name}
                   required
-                  onChange={(event) => setName(event.target.value)}
+                  onChange={(event) => handleInputChange('name', event.target.value)}
                   label="Namn"
                   autoComplete="name"
                 />
@@ -137,9 +114,9 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({ onUserCreated
                 <OutlinedInput
                   id="email"
                   type="email"
-                  value={email}
+                  value={userModel.email}
                   required
-                  onChange={(event) => setEmail(event.target.value)}
+                  onChange={(event) => handleInputChange('email', event.target.value)}
                   label="Email"
                   autoComplete="email"
                 />
@@ -149,7 +126,7 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({ onUserCreated
                 <OutlinedInput
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  value={password}
+                  value={userModel.password}
                   endAdornment={
                     <InputAdornment position="end">
                       <IconButton
@@ -162,31 +139,8 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({ onUserCreated
                     </InputAdornment>
                   }
                   required
-                  onChange={(event) => setPassword(event.target.value)}
+                  onChange={(event) => handleInputChange('password', event.target.value)}
                   label="Lösenord"
-                  autoComplete="new-password"
-                />
-              </FormControl>
-              <FormControl sx={{ m: 0.5, width: '100%' }} variant="outlined">
-                <InputLabel htmlFor="confirmPassword">Repetera lösenord</InputLabel>
-                <OutlinedInput
-                  id="confirmPassword"
-                  type={showPassword ? 'text' : 'password'}
-                  value={confirmPassword}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                        edge="end">
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                  required
-                  onChange={(event) => setConfirmPassword(event.target.value)}
-                  label="Repetera lösenord"
                   autoComplete="new-password"
                 />
               </FormControl>
@@ -195,9 +149,9 @@ const CreateUserComponent: React.FC<CreateUserComponentProps> = ({ onUserCreated
                 <Select
                   labelId="role"
                   id="createAdmin"
-                  value={createAdmin}
+                  value={userModel.isAdmin}
                   label="Roll"
-                  onChange={(event) => setCreateAdmin(event.target.value === 'true')}
+                  onChange={(event) => handleInputChange('isAdmin', event.target.value === 'true')}
                   sx={{ textAlign: 'left' }}>
                   <MenuItem value="false">Rådgivare</MenuItem>
                   <MenuItem value="true">Ansvarig</MenuItem>

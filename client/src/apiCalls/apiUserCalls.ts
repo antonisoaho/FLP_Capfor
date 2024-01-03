@@ -3,7 +3,7 @@ import { ApiResponse, ErrorResponse } from './models/ApiModel';
 import LoginResponse from '../components/login/models/LoginResponse';
 import UserModel from '../components/users/models/UserModel';
 import UpdateUserModel from '../components/users/usercredentials/models/UpdateUserModel';
-import AdvisorModel from '../components/customers/models/AdvisorModel';
+import CreateUserModel from '../components/users/createUser/models/CreateUserModel';
 
 export const loginAPI = async (
   email: string,
@@ -74,7 +74,7 @@ export const getSingleUserById = async (id: string): Promise<ApiResponse<UserMod
 
 export const updateSingleUserById = async (id: string, newData: UpdateUserModel) => {
   try {
-    const response = await axiosInstance.put<UpdateUserModel>(`users/singleuser/${id}`, {
+    const response = await axiosInstance.patch<UpdateUserModel>(`users/singleuser/${id}`, {
       newData,
     });
 
@@ -91,6 +91,58 @@ export const updateSingleUserById = async (id: string, newData: UpdateUserModel)
       success: false,
       status: extendedError.status,
       error: errorMessage.error || 'Ett oväntat fel inträffade.',
+    };
+  }
+};
+
+export const createNewUser = async ({
+  name = '',
+  email = '',
+  password = '',
+  isAdmin = false,
+}: CreateUserModel): Promise<ApiResponse<CreateUserModel>> => {
+  try {
+    const response = await axiosInstance.post<CreateUserModel>('/users/createuser', {
+      name,
+      email,
+      password,
+      isAdmin,
+    });
+
+    return {
+      success: true,
+      status: response.status,
+      data: response.data,
+    };
+  } catch (error) {
+    const extendedError = error as ExtendedError;
+    const errorMessage: ErrorResponse = <ErrorResponse>extendedError.response?.data;
+
+    return {
+      success: false,
+      status: extendedError.status,
+      error: errorMessage.error || 'Ett oväntat fel inträffade.',
+    };
+  }
+};
+
+export const deleteUserById = async (id: string): Promise<ApiResponse<string>> => {
+  try {
+    const response = await axiosInstance.delete(`/users/singleuser/${id}`);
+
+    return {
+      success: true,
+      status: response.status,
+      data: response.data,
+    };
+  } catch (error) {
+    const extendedError = error as ExtendedError;
+    const errorMessage: ErrorResponse = <ErrorResponse>extendedError.response?.data;
+
+    return {
+      success: false,
+      status: extendedError.status,
+      error: errorMessage.error || 'Ett oväntat fel inträffade vid radering av användare.',
     };
   }
 };

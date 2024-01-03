@@ -32,21 +32,21 @@ import { getSingleUserById, getUserList } from '../../apiCalls/apiUserCalls';
 const UserComponent = () => {
   const [users, setUsers] = useState<Array<UserModel>>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+  const [createOpen, setCreateOpen] = useState<boolean>(false);
   const [changeOpen, setChangeOpen] = useState<boolean>(false);
-  const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const setSnackbarState = useSetRecoilState(snackbarState);
 
   const { isAdmin } = useRecoilValue(userState);
 
-  const handleDrawerOpen = () => {
-    setDrawerOpen(true);
+  const handleCreateUserOpen = () => {
+    setCreateOpen(true);
   };
 
-  const handleDrawerClose = () => {
-    setDrawerOpen(false);
+  const handleCreateUserClose = () => {
+    setCreateOpen(false);
   };
-  const handleUserPrefsOpen = (selectedUser: UserModel) => {
+  const handleUserPrefsOpen = (selectedUser: string) => {
     setChangeOpen(true);
     setSelectedUser(selectedUser);
   };
@@ -79,7 +79,7 @@ const UserComponent = () => {
     getUsers();
   };
 
-  const Row = (props: { row: UserModel; onUserPrefsOpen: (selectedUser: UserModel) => void }) => {
+  const Row = (props: { row: UserModel; onUserPrefsOpen: (selectedUser: string) => void }) => {
     const { row, onUserPrefsOpen } = props;
     const [open, setOpen] = useState<boolean>(false);
 
@@ -100,7 +100,6 @@ const UserComponent = () => {
           });
         }
       }
-
       setOpen(!open);
     };
 
@@ -143,7 +142,10 @@ const UserComponent = () => {
                       <TableCell>Skapad</TableCell>
                       <TableCell>
                         <Tooltip title="Redigera användare" placement="right" arrow>
-                          <Fab size="small" aria-label="edit" onClick={() => onUserPrefsOpen(row)}>
+                          <Fab
+                            size="small"
+                            aria-label="edit"
+                            onClick={() => onUserPrefsOpen(row._id)}>
                             <EditIcon />
                           </Fab>
                         </Tooltip>
@@ -194,11 +196,11 @@ const UserComponent = () => {
               }}
               color="primary"
               aria-label="add"
-              onClick={handleDrawerOpen}>
+              onClick={handleCreateUserOpen}>
               <AddIcon />
             </Fab>
           </Tooltip>
-          <Drawer anchor="right" open={drawerOpen} onClose={handleDrawerClose}>
+          <Drawer anchor="right" open={createOpen} onClose={handleCreateUserClose}>
             <CreateUserComponent onUserCreated={handleUsers} />
           </Drawer>
         </>
@@ -207,13 +209,7 @@ const UserComponent = () => {
       {isAdmin && changeOpen && (
         <>
           <Drawer anchor="top" open={changeOpen} onClose={handleUserPrefsClose}>
-            <UserCredentialsComponent
-              onUserChanged={handleUsers}
-              _id={selectedUser?._id || ''}
-              name={selectedUser?.name || ''}
-              email={selectedUser?.email || ''}
-              isAdmin={selectedUser?.isAdmin || false}
-            />
+            <UserCredentialsComponent onUserChanged={handleUsers} _id={selectedUser || ''} />
           </Drawer>
         </>
       )}

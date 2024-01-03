@@ -1,10 +1,5 @@
 const { Schema, model } = require('mongoose');
 
-const defaultValueWorkConditions = (length, defaultValue) =>
-  Array.from({ length }, () => defaultValue);
-
-const requiredField = (field) => field && field.length > 0;
-
 const customerSchema = new Schema(
   {
     advisor: {
@@ -12,255 +7,278 @@ const customerSchema = new Schema(
       ref: 'User',
       required: true,
     },
-    customerDetails: {
-      name: { type: [String], required: true },
-      yearMonth: { type: [Number], required: true },
-      status: { type: [String], required: true },
-    },
-    customerChildren: {
-      name: [String],
-      yearMonth: [Number],
-      belongsTo: [String],
-      childSupportCounts: [Boolean],
-      livesAtHomeToAge: [Number],
-    },
-    workConditions: {
-      pensionAge: {
-        type: [Number],
-        required: true,
-        default: function () {
-          return defaultValueWorkConditions(this.customerDetails.name.length, 65);
+    customerDetails: [
+      {
+        name: { type: String, required: true },
+        yearMonth: { type: Number, required: true },
+        status: { type: String, required: true },
+      },
+    ],
+    customerChildren: [
+      {
+        name: { type: String },
+        yearMonth: { type: Number },
+        belongsTo: { type: String },
+        childSupportCounts: { type: Boolean },
+        livesAtHomeToAge: { type: Number },
+      },
+    ],
+    workConditions: [
+      {
+        belongs: { type: String },
+        pensionAge: {
+          type: Number,
+          required: true,
+          default: 65,
         },
-      },
-      activeTimeEnd: {
-        type: [Number],
-        required: true,
-        default: function () {
-          return defaultValueWorkConditions(this.customerDetails.name.length, 85);
+        activeTimeEnd: {
+          type: Number,
+          required: true,
+          default: 85,
         },
-      },
-      lifeSpan: {
-        type: [Number],
-        required: true,
-        default: function () {
-          return defaultValueWorkConditions(this.customerDetails.name.length, 90);
+        lifeSpan: {
+          type: Number,
+          required: true,
+          default: 90,
         },
-      },
-      sickPay: {
-        type: [Boolean],
-        required: true,
-        default: function () {
-          return defaultValueWorkConditions(this.customerDetails.name.length, false);
+        sickPay: {
+          type: Boolean,
+          required: true,
+          default: false,
         },
+        occupation: { type: String, required: true },
+        collectiveAgreement: { type: Boolean, required: true, default: false },
       },
-      occupation: { type: [String], required: true },
-      collectiveAgreement: [Boolean],
-    },
-    income: {
-      baseValues: {
-        serviceIncome: [Number],
-        ofWhichOwnAB: [Number],
-        companyCarBenefit: [Boolean],
-        soleTraderIncome: [Number],
-        deficitOffset: [Boolean],
-        taxFree: [Number],
-        k10: {
-          amount: [Number],
-          distributionMonth: [Number],
-          savedDistribution: [Number],
-          financialStatementsMonth: [Number],
-          salaryBasis: [Number],
-          ownershipShare: [Number],
-        },
-      },
-      changeValues: {
-        name: [String],
-        changeType: [String],
-        when: [Number],
-        newAmount: [Number],
-      },
-    },
-    expenses: {
-      baseValues: {
-        expenseType: [String],
-        mapped: [Number],
-        correction: [Number],
-        difCrisis: [Number],
-        difPension: [Number],
-        difActiveEnd: [Number],
-        difDeath: [Number],
-        childMovesOut: [Number],
-      },
-      changeValues: {
-        changeType: [String],
-        when: [Number],
-        ongoing: [Number],
-        value: [Number],
-        comment: [String],
-      },
-    },
-    investments: {
-      investmentType: [String],
-      institution: [String],
-      name: [String],
-      owner: {
-        type: [String],
-        required: function () {
-          return requiredField(this.investments.investmentType);
-        },
-      },
-      depositedAmount: {
-        type: [Number],
-        required: function () {
-          return requiredField(this.investments.investmentType);
-        },
-      },
-      value: {
-        type: [Number],
-        required: function () {
-          return requiredField(this.investments.investmentType);
-        },
-      },
-      riskClass: [Number],
-      charge: [Number],
-      timePerspective: [Number],
-      monthlySavings: [Number],
-      saveForHowLong: [Number],
-      projectedGrowth: [Number],
-    },
-    liabilities: {
-      baseValues: {
-        loanType: [String],
-        lender: [String],
-        name: [String],
-        borrower: {
-          type: [String],
-          required: function () {
-            return requiredField(this.liabilities.baseValues.loanType);
+    ],
+    income: [
+      {
+        belongs: { type: String },
+        baseValues: {
+          serviceIncome: { type: Number },
+          ofWhichOwnAB: { type: Number },
+          companyCarBenefit: { type: Boolean },
+          soleTraderIncome: { type: Number },
+          deficitOffset: { type: Boolean },
+          taxFree: { type: Number },
+          k10: {
+            amount: { type: Number },
+            distributionMonth: { type: Number },
+            savedDistribution: { type: Number },
+            financialStatementsMonth: { type: Number },
+            salaryBasis: { type: Number },
+            ownershipShare: { type: Number },
           },
         },
-        debt: {
-          type: [Number],
-          required: function () {
-            return requiredField(this.liabilities.baseValues.loanType);
+        changeValues: [
+          {
+            changeType: { type: String },
+            when: { type: Number },
+            newAmount: { type: Number },
           },
+        ],
+      },
+    ],
+    expenses: [
+      {
+        belongs: { type: String },
+        baseValues: {
+          expenseType: { type: String },
+          mapped: { type: Number },
+          correction: { type: Number },
+          difCrisis: { type: Number },
+          difPension: { type: Number },
+          difActiveEnd: { type: Number },
+          difDeath: [{ type: Number }],
+          childMovesOut: { type: Number },
         },
-        interest: {
-          type: [Number],
-          required: function () {
-            return requiredField(this.liabilities.baseValues.loanType);
-          },
-        },
-        monthlyAmortization: {
-          type: [Number],
-          required: function () {
-            return requiredField(this.liabilities.baseValues.loanType);
-          },
-        },
-        loanProtection: {
-          death: [Boolean],
-          sickness: [Boolean],
-          unemployment: [Boolean],
-          maximumAmount: [Number],
+        changeValues: {
+          changeType: { type: String },
+          when: { type: Number },
+          ongoing: { type: Number },
+          value: { type: Number },
+          comment: { type: String },
         },
       },
-      planned: {
-        loan: [String],
-        event: [String],
-        when: [String],
-        amount: [Number],
-        interest: [Number],
-      },
-      assets: {
-        assetType: [String],
-        name: [String],
-        value: {
-          type: [Number],
-          required: function () {
-            return requiredField(this.liabilities.assets.assetType);
-          },
-        },
-        stake: [Number],
-        mortgageDeed: [Number],
-        valueYear: [Number],
+    ],
+    investments: [
+      {
+        investmentType: { type: String },
+        institution: { type: String },
+        name: { type: String },
         owner: {
-          type: [String],
+          type: String,
           required: function () {
-            return requiredField(this.liabilities.assets.assetType);
+            return this.investments.investmentType != null;
           },
         },
-        tax: [Number],
-        assessedValue: [Number], //Taxeringsvärde
-        legalTitleCost: [Number],
-        investments: [Number],
-      },
-      insurances: {
-        property: {
-          propertyType: [String],
-          company: [String],
-          expiryDate: [Date],
-          premiumCost: [Number],
-          paymentPeriod: [String],
-          lastControl: [Date],
-        },
-        person: {
-          sickness: {
-            insured: [String],
-            company: [String],
-            insuranceType: [String],
-            taxCategory: [String],
-            qualifyingPeriod: [String],
-            compensationAmount: [Number],
-            compensationPeriod: [String],
-            premiumCost: [Number],
-            expiryDate: [Date],
-            lastUpdated: [Date],
-          },
-          work: {
-            insured: [String],
-            insuranceType: [String],
-          },
-          accident: {
-            insured: [String],
-            company: [String],
-            insuranceType: [String],
-            compensationAmount: [Number],
-            premiumCost: [Number],
-            expiryDate: [Date],
-            lastControl: [Date],
-          },
-          death: {
-            insured: [String],
-            company: [String],
-            insuranceType: [String],
-            compensationAmount: [Number],
-            premiumCost: [Number],
-            expiryDate: [Date],
-            beneficiary: [String],
-            lastControl: [Date],
+        depositedAmount: {
+          type: Number,
+          required: function () {
+            return this.investments.investmentType != null;
           },
         },
+        value: {
+          type: Number,
+          required: function () {
+            return this.investments.investmentType != null;
+          },
+        },
+        riskClass: { type: Number },
+        charge: { type: Number },
+        timePerspective: { type: Number },
+        monthlySavings: { type: Number },
+        saveForHowLong: { type: Number },
+        projectedGrowth: { type: Number },
       },
-      pension: {
-        insured: [String],
-        company: [String],
-        pensionType: [String],
-        pensionName: [String],
-        pensionValue: [Number],
-        pensionAge: [Number],
-        monthlyPension: [Number],
-        compensationPeriod: [String],
-        altPaymentAge: [Number],
-        impactPercent: [Number],
-        shellFee: [Number],
-        riskClass: [Number],
-        fundFee: [Number],
-        estIncreasedValue: [Number],
-        annualSavings: [Number],
-        commitmentPowers: [Boolean],
-        beneficiary: [String],
+    ],
+    liabilities: [
+      {
+        baseValues: {
+          loanType: { type: String },
+          lender: { type: String },
+          name: { type: String },
+          borrower: {
+            type: String,
+            required: function () {
+              return this.liabilities.baseValues.loanType != null;
+            },
+          },
+          debt: {
+            type: [Number],
+            required: function () {
+              return this.liabilities.baseValues.loanType != null;
+            },
+          },
+          interest: {
+            type: [Number],
+            required: function () {
+              return this.liabilities.baseValues.loanType != null;
+            },
+          },
+          monthlyAmortization: {
+            type: [Number],
+            required: function () {
+              return this.liabilities.baseValues.loanType != null;
+            },
+          },
+          loanProtection: {
+            death: { type: Boolean },
+            sickness: { type: Boolean },
+            unemployment: { type: Boolean },
+            maximumAmount: { type: Number },
+          },
+        },
+        planned: {
+          loan: { type: String },
+          event: { type: String },
+          when: { type: String },
+          amount: { type: Number },
+          interest: { type: Number },
+        },
       },
+    ],
+    assets: [
+      {
+        assetType: { type: String },
+        name: { type: String },
+        value: {
+          type: Number,
+          required: function () {
+            return this.liabilities.assets.assetType != null;
+          },
+        },
+        stake: { type: Number },
+        mortgageDeed: { type: Number },
+        valueYear: { type: Number },
+        owner: {
+          type: String,
+          required: function () {
+            return this.liabilities.assets.assetType != null;
+          },
+        },
+        tax: { type: Number },
+        assessedValue: { type: Number }, //Taxeringsvärde
+        legalTitleCost: { type: Number },
+        investments: { type: Number },
+      },
+    ],
+    insurances: {
+      property: [
+        {
+          propertyType: { type: String },
+          company: { type: String },
+          expiryDate: { type: Date },
+          premiumCost: { type: Number },
+          paymentPeriod: { type: String },
+          lastControl: { type: Date },
+        },
+      ],
+      person: [
+        {
+          insured: { type: String },
+          sickness: [
+            {
+              company: { type: String },
+              insuranceType: { type: String },
+              taxCategory: { type: String },
+              qualifyingPeriod: { type: String },
+              compensationAmount: { type: Number },
+              compensationPeriod: { type: String },
+              premiumCost: { type: Number },
+              expiryDate: { type: Date },
+              lastUpdated: { type: Date },
+            },
+          ],
+          work: [
+            {
+              insuranceType: { type: String },
+            },
+          ],
+          accident: [
+            {
+              company: { type: String },
+              insuranceType: { type: String },
+              compensationAmount: { type: Number },
+              premiumCost: { type: Number },
+              expiryDate: { type: Date },
+              lastControl: { type: Date },
+            },
+          ],
+          death: [
+            {
+              company: { type: String },
+              insuranceType: { type: String },
+              compensationAmount: { type: Number },
+              premiumCost: { type: Number },
+              expiryDate: { type: Date },
+              beneficiary: { type: String },
+              lastControl: { type: Date },
+            },
+          ],
+        },
+      ],
     },
+    pension: [
+      {
+        insured: { type: String },
+        company: { type: String },
+        pensionType: { type: String },
+        pensionName: { type: String },
+        pensionValue: { type: Number },
+        pensionAge: { type: Number },
+        monthlyPension: { type: Number },
+        compensationPeriod: { type: String },
+        altPaymentAge: { type: Number },
+        impactPercent: { type: Number },
+        shellFee: { type: Number },
+        riskClass: { type: Number },
+        fundFee: { type: Number },
+        estIncreasedValue: { type: Number },
+        annualSavings: { type: Number },
+        commitmentPowers: { type: Boolean },
+        beneficiary: { type: String },
+      },
+    ],
   },
   { timestamps: true }
 );
