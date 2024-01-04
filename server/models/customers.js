@@ -1,19 +1,20 @@
 const { Schema, model } = require('mongoose');
-const customerDetailsSchema = require('./customermodels/details');
-const childSchema = require('./customermodels/children');
-const workConditionSchema = require('./customermodels/workConditions');
-const expensesSchema = require('./customermodels/expenses');
-const incomeSchema = require('./customermodels/income');
-const investmentSchema = require('./customermodels/investments');
-const liabilitySchema = require('./customermodels/liabilities');
-const pensionSchema = require('./customermodels/pension');
-const assetSchema = require('./customermodels/assets');
+const customerDetailsSchema = require('./customerModels/details');
+const childSchema = require('./customerModels/children');
+const workConditionSchema = require('./customerModels/workConditions');
+const { expensesBaseSchema, expensesChangeSchema } = require('./customerModels/expenses');
+const { incomeBaseSchema, incomeChangeSchema } = require('./customerModels/income');
+const investmentSchema = require('./customerModels/investments');
+const liabilitySchema = require('./customerModels/liabilities');
+const pensionSchema = require('./customerModels/pension');
+const assetSchema = require('./customerModels/assets');
 const {
   propertyInsuranceSchema,
   sickInsuranceSchema,
   accidentInsuranceSchema,
   deathInsuranceSchema,
-} = require('./customermodels/insurances');
+  workInsuranceSchema,
+} = require('./customerModels/insurances');
 
 const customerSchema = new Schema(
   {
@@ -25,26 +26,23 @@ const customerSchema = new Schema(
     customerDetails: [customerDetailsSchema],
     customerChildren: [childSchema],
     workConditions: [workConditionSchema],
-    income: [incomeSchema],
-    expenses: [expensesSchema],
+    income: {
+      base: [incomeBaseSchema],
+      change: [incomeChangeSchema],
+    },
+    expenses: {
+      base: [expensesBaseSchema],
+      change: [expensesChangeSchema],
+    },
     investments: [investmentSchema],
     liabilities: [liabilitySchema],
     assets: [assetSchema],
     insurances: {
       property: [propertyInsuranceSchema],
-      person: [
-        {
-          insured: { type: String },
-          sickness: [sickInsuranceSchema],
-          work: [
-            {
-              insuranceType: { type: String },
-            },
-          ],
-          accident: [accidentInsuranceSchema],
-          death: [deathInsuranceSchema],
-        },
-      ],
+      sickness: [sickInsuranceSchema],
+      accident: [accidentInsuranceSchema],
+      death: [deathInsuranceSchema],
+      work: [workInsuranceSchema],
     },
     pension: [pensionSchema],
   },

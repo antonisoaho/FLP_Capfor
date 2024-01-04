@@ -2,8 +2,8 @@ import axiosInstance, { ExtendedError } from '../axios/AxiosInstance';
 import { ApiResponse, ErrorResponse } from './models/ApiModel';
 import LoginResponse from '../components/login/models/LoginResponse';
 import UserModel from '../components/users/models/UserModel';
-import UpdateUserModel from '../components/users/usercredentials/models/UpdateUserModel';
-import CreateUserModel from '../components/users/createUser/models/CreateUserModel';
+import UpdateUserModel from '../components/users/userHandlers/models/UpdateUserModel';
+import CreateUserModel from '../components/users/userHandlers/models/CreateUserModel';
 
 export const loginAPI = async (
   email: string,

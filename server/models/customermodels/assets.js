@@ -13,7 +13,7 @@ const assetSchema = new Schema(
     stake: { type: Number },
     mortgageDeed: { type: Number },
     valueYear: { type: Number },
-    owner: {
+    belongs: {
       type: String,
       required: function () {
         return this.assetType != null;

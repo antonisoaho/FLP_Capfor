@@ -5,7 +5,7 @@ const investmentSchema = new Schema(
     investmentType: { type: String },
     institution: { type: String },
     name: { type: String },
-    owner: {
+    belongs: {
       type: String,
       required: function () {
         return this.investmentType != null;

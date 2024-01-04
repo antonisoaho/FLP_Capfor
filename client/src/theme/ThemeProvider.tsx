@@ -1,15 +1,5 @@
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
-import {
-  ThemeProvider as MuiThemeProvider,
-  createTheme,
-  CssBaseline,
-} from '@mui/material';
+import React, { createContext, ReactNode, useContext, useState } from 'react';
+import { ThemeProvider as MuiThemeProvider, createTheme, CssBaseline } from '@mui/material';
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -20,9 +10,7 @@ interface ThemeContextValue {
   toggleTheme: () => void;
 }
 
-export const ThemeContext = createContext<ThemeContextValue | undefined>(
-  undefined
-);
+export const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -39,6 +27,20 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   };
 
   const theme = createTheme({
+    typography: {
+      fontFamily: [
+        '-apple-system',
+        'BlinkMacSystemFont',
+        '"Segoe UI"',
+        'Roboto',
+        '"Helvetica Neue"',
+        'Arial',
+        'sans-serif',
+        '"Apple Color Emoji"',
+        '"Segoe UI Emoji"',
+        '"Segoe UI Symbol"',
+      ].join(','),
+    },
     palette: {
       mode: isDarkMode ? 'dark' : 'light',
     },

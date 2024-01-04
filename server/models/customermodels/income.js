@@ -1,9 +1,9 @@
 const { Schema } = require('mongoose');
 
-const incomeSchema = new Schema(
+const incomeBaseSchema = new Schema(
   {
     belongs: { type: String },
-    baseValues: {
+    values: {
       serviceIncome: { type: Number },
       ofWhichOwnAB: { type: Number },
       companyCarBenefit: { type: Boolean },
@@ -19,15 +19,20 @@ const incomeSchema = new Schema(
         ownershipShare: { type: Number },
       },
     },
-    changeValues: [
-      {
-        changeType: { type: String },
-        when: { type: Number },
-        newAmount: { type: Number },
-      },
-    ],
   },
   { timestamps: true }
 );
 
-module.exports = incomeSchema;
+const incomeChangeSchema = new Schema(
+  {
+    belongs: { type: String },
+    values: {
+      changeType: { type: String },
+      when: { type: Number },
+      newAmount: { type: Number },
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = { incomeBaseSchema, incomeChangeSchema };

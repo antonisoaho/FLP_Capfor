@@ -1,7 +1,5 @@
 import { Box, Button, Card, CardActions, CardContent, Container, TextField } from '@mui/material';
 import React, { useState, KeyboardEvent, FormEvent } from 'react';
-import axiosInstance, { ExtendedError } from '../../axios/AxiosInstance';
-import LoginResponse from './models/LoginResponse';
 import globalRouter from '../../globalRouter';
 import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';

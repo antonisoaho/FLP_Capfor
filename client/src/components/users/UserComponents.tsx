@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import UserModel from './models/UserModel';
-import CreateUserComponent from './createUser/CreateUserComponent';
+import CreateUserComponent from './userHandlers/CreateUserComponent';
 import {
   Box,
   CircularProgress,
@@ -24,7 +24,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import UserCredentialsComponent from './usercredentials/UserCredentialsComponent';
+import UserCredentialsComponent from './userHandlers/UserCredentialsComponent';
 import { snackbarState, userState } from '../../recoil/RecoilAtoms';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { getSingleUserById, getUserList } from '../../apiCalls/apiUserCalls';

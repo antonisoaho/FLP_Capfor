@@ -2,18 +2,21 @@ const { Schema } = require('mongoose');
 
 const propertyInsuranceSchema = new Schema(
   {
-    propertyType: { type: String },
-    company: { type: String },
-    expiryDate: { type: Date },
-    premiumCost: { type: Number },
-    paymentPeriod: { type: String },
-    lastControl: { type: Date },
+    property: {
+      propertyType: { type: String },
+      company: { type: String },
+      expiryDate: { type: Date },
+      premiumCost: { type: Number },
+      paymentPeriod: { type: String },
+      lastControl: { type: Date },
+    },
   },
   { timestamps: true }
 );
 
 const sickInsuranceSchema = new Schema(
   {
+    belongs: { type: String },
     company: { type: String },
     insuranceType: { type: String },
     taxCategory: { type: String },
@@ -29,6 +32,7 @@ const sickInsuranceSchema = new Schema(
 
 const accidentInsuranceSchema = new Schema(
   {
+    belongs: { type: String },
     company: { type: String },
     insuranceType: { type: String },
     compensationAmount: { type: Number },
@@ -41,6 +45,7 @@ const accidentInsuranceSchema = new Schema(
 
 const deathInsuranceSchema = new Schema(
   {
+    belongs: { type: String },
     company: { type: String },
     insuranceType: { type: String },
     compensationAmount: { type: Number },
@@ -52,9 +57,18 @@ const deathInsuranceSchema = new Schema(
   { timestamps: true }
 );
 
+const workInsuranceSchema = new Schema(
+  {
+    belongs: { type: String },
+    insuranceType: { type: String },
+  },
+  { timestamps: true }
+);
+
 module.exports = {
   propertyInsuranceSchema,
   sickInsuranceSchema,
   deathInsuranceSchema,
   accidentInsuranceSchema,
+  workInsuranceSchema,
 };

@@ -2,7 +2,7 @@ const { Schema } = require('mongoose');
 
 const pensionSchema = new Schema(
   {
-    insured: { type: String },
+    belongs: { type: String },
     company: { type: String },
     pensionType: { type: String },
     pensionName: { type: String },

@@ -6,7 +6,7 @@ const liabilitySchema = new Schema(
       loanType: { type: String },
       lender: { type: String },
       name: { type: String },
-      borrower: {
+      belongs: {
         type: String,
         required: function () {
           return this.baseValues.loanType != null;

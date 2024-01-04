@@ -1,9 +1,9 @@
 const { Schema } = require('mongoose');
 
-const expensesSchema = new Schema(
+const expensesBaseSchema = new Schema(
   {
     belongs: { type: String },
-    baseValues: {
+    values: {
       expenseType: { type: String },
       mapped: { type: Number },
       correction: { type: Number },
@@ -13,7 +13,14 @@ const expensesSchema = new Schema(
       difDeath: [{ type: Number }],
       childMovesOut: { type: Number },
     },
-    changeValues: {
+  },
+  { timestamps: true }
+);
+
+const expensesChangeSchema = new Schema(
+  {
+    belongs: { type: String },
+    values: {
       changeType: { type: String },
       when: { type: Number },
       ongoing: { type: Number },
@@ -24,4 +31,4 @@ const expensesSchema = new Schema(
   { timestamps: true }
 );
 
-module.exports = expensesSchema;
+module.exports = { expensesChangeSchema, expensesBaseSchema };

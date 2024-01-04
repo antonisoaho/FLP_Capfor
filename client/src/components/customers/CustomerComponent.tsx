@@ -25,7 +25,6 @@ import { getCustomerList } from '../../apiCalls/apiCustomerCalls';
 const CustomerComponent = () => {
   const [customers, setCustomers] = useState<Array<CustomerModel>>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedCustomer, setSelectedCustomer] = useState<CustomerModel | null>(null);
   const [selectedAdvisor, setSelectedAdvisor] = useState<any>(-1);
   const [advisorList, setAdvisorList] = useState<UserModel[] | null>(null);
   const { isAdmin, userId } = useRecoilValue(userState);

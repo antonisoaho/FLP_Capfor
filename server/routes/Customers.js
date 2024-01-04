@@ -79,11 +79,12 @@ router
         .json({ error: err.message || 'Fel inträffade vi hämtning av kund.' });
     }
   })
-  .patch('/:field/:id', async (req, res) => {
+  .patch('/update/:field/:subfield?/:id', async (req, res) => {
     const customerId = req.params.id;
-    const fieldName = req.params.field;
+    const field = req.params.field;
+    const subField = req.params.subfield;
     const { userId, isAdmin } = req.user;
-    const updatedValues = req.body[fieldName];
+    const newData = subField ? req.body[subField] : req.body[field];
 
     if (!mongoose.Types.ObjectId.isValid(customerId)) {
       return res.status(400).json({ error: 'Ogiltigt kund-ID.' });
@@ -96,17 +97,21 @@ router
         return res.status(403).json({ error: 'Obehörig åtkomst till vald kund.' });
       }
 
-      const updatedCustomer = await Customer.findByIdAndUpdate(
-        customerId,
-        { [fieldName]: updatedValues },
-        { new: true }
-      );
+      const fieldPath = subField ? `${field}.${subField}` : field;
+      const updateQuery = { $push: { [fieldPath]: newData } };
+
+      const updatedCustomer = await Customer.findByIdAndUpdate(customerId, updateQuery, {
+        new: true,
+      });
 
       if (!updatedCustomer) {
         return res.status(404).json({ error: 'Kunde inte hitta kund.' });
       }
-
-      res.status(200).send(updatedCustomer[fieldName]);
+      if (subField) {
+        res.status(200).send(updatedCustomer[field][subField]);
+      } else {
+        res.status(200).send(updatedCustomer[field]);
+      }
     } catch (err) {
       res
         .status(err.status || 500)
