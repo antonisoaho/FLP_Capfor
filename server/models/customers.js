@@ -1,12 +1,13 @@
 const { Schema, model } = require('mongoose');
 const customerDetailsSchema = require('./customermodels/details');
 const childSchema = require('./customermodels/children');
+const workConditionSchema = require('./customermodels/workConditions');
 const expensesSchema = require('./customermodels/expenses');
 const incomeSchema = require('./customermodels/income');
 const investmentSchema = require('./customermodels/investments');
 const liabilitySchema = require('./customermodels/liabilities');
-const pensionSchema = require('.customermodels/pension');
-const assetSchema = require('.customermodels/assets');
+const pensionSchema = require('./customermodels/pension');
+const assetSchema = require('./customermodels/assets');
 const {
   propertyInsuranceSchema,
   sickInsuranceSchema,
